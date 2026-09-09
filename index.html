@@ -319,15 +319,6 @@ function switchTab(t){
 }
 
 // ═══ HOME ═══
-// Cover images for homepage rotation
-const HP=[
-  {i:'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80',s:'Arkivets essens'},
-  {i:'https://images.unsplash.com/photo-1519682337058-a94d519337bc?w=800&q=80',s:'Håndskrevne minner'},
-  {i:'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&q=80',s:'Ord på papir'},
-  {i:'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&q=80',s:'Dagbøker og tanker'},
-  {i:'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80',s:'Historiens sider'},
-  {i:'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=800&q=80',s:'Skrevne ord'}
-];
 let hIdx=Math.floor(Math.random()*HP.length);
 function renderHome(){
   if(typeof HP==='undefined'||!HP.length)return;
