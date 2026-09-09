@@ -1,0 +1,13 @@
+[
+  {
+    "i": 0,
+    "d": "2026-09-09",
+    "t": "Demo: Email-generert innlegg",
+    "s": "demo-email-generert-innlegg",
+    "c": "annet",
+    "x": "Dette er et demonstrasjonsinnlegg som viser hvordan e-post til blogg-funksjonen fungerer.\n\nNår Trond sender en e-post til den dedikerte adressen, gjør systemet følgende:\n\n1. Mottar e-posten via webhook fra Resend\n2. Fjerner automatisk alle mottakerlister (To, CC, BCC)\n3. Fjerner alle e-postadresser\n4. Fjerner e-post-headere (From, To, Subject, Date, etc.)\n5. Fjerner signaturer og annen metadata\n6. Beholder kun det faktiske innholdet\n7. Lagrer som ny bloggpost\n\nDette er perfekt for Tronds arbeidsflyt hvor han ofte CC'er mange personer, men kun ønsker at selve budskapet publiseres offentlig.\n\nSystemet er bygget med:\n- Resend Inbound Email API for mottak\n- Vercel serverless functions for behandling\n- GitHub API for lagring\n- Automatisk kategorisering basert på innhold",
+    "u": "",
+    "img": [],
+    "dr": []
+  }
+]

@@ -1,0 +1,17 @@
+{
+  "name": "trondw-archive",
+  "version": "1.0.0",
+  "description": "Trond Worren archive with email-to-blog functionality",
+  "scripts": {
+    "build": "node build-index.js",
+    "dev": "npx serve .",
+    "deploy": "vercel"
+  },
+  "keywords": ["archive", "blog", "email"],
+  "author": "Mads",
+  "license": "MIT",
+  "dependencies": {
+    "@octokit/rest": "^20.0.2"
+  },
+  "devDependencies": {}
+}
