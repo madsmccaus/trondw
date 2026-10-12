@@ -260,3 +260,5 @@ curl -X POST https://trondw-xxx.vercel.app/api/test-email \
 
 **Project URL:** https://github.com/madsmccaus/trondw/pull/1
 **Ready for:** Immediate deployment ✅
+
+> **Update (Oct 2026):** `/api/test-email` was removed (it was an unauthenticated endpoint that could commit to GitHub), and the MX above was wrong. See DEPLOYMENT.md for current Resend inbound setup on `post.trondworren.net`.
