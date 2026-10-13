@@ -5,9 +5,14 @@
   "scripts": {
     "build": "node build-index.js",
     "dev": "npx serve .",
-    "deploy": "vercel"
+    "deploy": "vercel",
+    "test": "node --test test/*.test.js"
   },
-  "keywords": ["archive", "blog", "email"],
+  "keywords": [
+    "archive",
+    "blog",
+    "email"
+  ],
   "author": "Mads",
   "license": "MIT",
   "dependencies": {
