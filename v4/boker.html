@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dokumenter · Trond Worren</title>
+<title>Bøker · Trond Worren</title>
 <script src="/v4/theme.js"></script>
 <link rel="preload" href="/fonts/EBGaramond-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/v4/site.css">
@@ -61,6 +61,8 @@ html.rd-lock{overflow:hidden}
 .fb-pg,.fb-sheet,.fb-stack i{position:absolute;top:0;width:var(--pw);height:var(--ph);background:var(--sheet)}
 .fb-pg{overflow:hidden;box-shadow:var(--paper-shadow)}
 .fb-pg.l{left:0}.fb-pg.r{right:0}.fb-pg.c{left:0}
+/* no shadow falls across the spine, so the gutter looks the same whether a leaf lies on it or not */
+.fb-pg.l{clip-path:inset(-60px 0 -60px -60px)}.fb-pg.r{clip-path:inset(-60px -60px -60px 0)}
 .fb-pg.blank{display:none}
 .fb-pg img{display:block;width:100%;height:100%;object-fit:contain;-webkit-user-drag:none}
 .thumb img,.feature .cover img,.fb-pg img,.fb-sheet>div img,.lf .s>b{filter:var(--page-filter)}
@@ -72,10 +74,12 @@ html.rd-lock{overflow:hidden}
 .fb-stack i:nth-child(1){transform:translate(3px,3px) rotate(.5deg)}
 .fb-stack i:nth-child(2){transform:translate(1.5px,1.5px) rotate(-.35deg)}
 /* spine shading, shared by pages and the bending leaf */
+/* bending leaf: nested strips, each turned a little more, give a real curve */
+/* gutter shade: 12% of a page, on both sides of the spine */
 .sp-l::after,.sp-r::after{content:"";position:absolute;top:0;bottom:0;width:12%;pointer-events:none}
 .sp-l::after{right:0;background:linear-gradient(to left,rgba(var(--shc),.08),rgba(var(--shc),.025) 40%,transparent)}
 .sp-r::after{left:0;background:linear-gradient(to right,rgba(var(--shc),.08),rgba(var(--shc),.025) 40%,transparent)}
-/* bending leaf: nested strips, each turned a little more, give a real curve */
+.lf .s>b>i{position:absolute;inset:0;pointer-events:none}
 .lf{position:absolute;top:0;width:var(--pw);height:var(--ph);transform-style:preserve-3d;z-index:3;pointer-events:none}
 .lf .s{position:absolute;top:0;height:var(--ph);transform-origin:left center;transform-style:preserve-3d}
 .lf .s>b{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background-color:var(--sheet);background-repeat:no-repeat}
@@ -110,16 +114,12 @@ html.rd-lock{overflow:hidden}
 <header class="site-head">
   <a class="mast" href="/v4">Trond Worren</a>
   <p class="tag">Tidligere tigger, uteligger.</p>
-  <nav class="site-nav" aria-label="Hovedmeny">
-    <a href="/v4">Forside</a><a href="/v4/arkiv">Arkiv</a><a href="/v4/dokumenter" aria-current="page">Dokumenter</a>
-    <span class="sep" aria-hidden="true"></span>
-    <button class="theme" id="theme" type="button" role="switch" aria-checked="false" aria-label="Mørk modus"><span class="track"><span class="thumb"></span></span></button>
-  </nav>
+  <nav class="site-nav" aria-label="Hovedmeny"><a href="/v4">Forside</a><a href="/v4/arkiv">Arkiv</a><a href="/v4/boker" aria-current="page">Bøker</a><a href="/v4/om">Om</a></nav>
 </header>
 <div class="page">
-  <h1 class="sr">Dokumenter</h1>
+  <h1 class="sr">Bøker</h1>
   <section class="feature" id="feature" aria-label="Tilfeldig dokument"></section>
-  <section aria-label="Alle dokumenter">
+  <section aria-label="Alle bøker">
     <div class="browse-head">
       <div class="years" id="years" role="group" aria-label="År"></div>
     </div>
@@ -128,7 +128,7 @@ html.rd-lock{overflow:hidden}
     <div class="more"><button class="btn ghost" id="more" hidden>Vis flere</button></div>
     <div id="sentinel" aria-hidden="true"></div>
   </section>
-  <footer class="site">Alt innhold tilhører Trond Worren</footer>
+  <footer class="site"><p>Alt innhold tilhører Trond Worren</p><button class="theme" id="theme" type="button" role="switch" aria-checked="false" aria-label="Mørk modus"><span class="track"><span class="thumb"></span></span></button></footer>
 </div>
 
 <div class="rd" id="reader" role="dialog" aria-modal="true" aria-labelledby="rdT">
@@ -230,11 +230,14 @@ const prevPos=p=>two?(p===2?1:p-2):p-1;
 const atEnd=p=>two?(p===1?N<2:p+1>=N):p>=N;
 const shiftFor=p=>{if(!two)return 0;const v=spread(p);if(v[0]<1)return -pw/2;if(v[1]>N)return pw/2;return 0;};
 const im=i=>i>=1&&i<=N?`<img src="${PS(i)}" alt="Side ${i} av ${N}" draggable="false">`:'';
-function pgHTML(i,side,v){if(i<1||i>N)return '';let sp='';if(two&&v[0]>=1&&v[1]<=N)sp=side==='l'?' sp-l':' sp-r';return `<div class="fb-pg ${two?side:'c'}${sp}" data-p="${i}">${im(i)}</div>`;}
+// a page carries the gutter shade whenever a page lies opposite it; during a turn the leaf is that page,
+// so the shade is the same before, during and after the turn
+const ex=i=>i>=1&&i<=N;
+function pgHTML(i,side,shade){if(!ex(i))return '';const sp=two&&shade?(side==='l'?' sp-l':' sp-r'):'';return `<div class="fb-pg ${two?side:'c'}${sp}" data-p="${i}">${im(i)}</div>`;}
 function stackHTML(){return N>=3?`<div class="fb-stack" style="${two?'right:0':'left:0'};opacity:${pos===1?1:0}"><i></i><i></i></div>`:'';}
 function draw(){
   if(mode==='sheet'){book.innerHTML=`<div class="fb-sheet" style="transform:rotateY(${sheetA}deg)"><div class="f">${im(1)}<u></u></div><div class="k">${N>1?im(2):''}<u></u></div></div>`;return;}
-  const v=spread(pos);book.innerHTML=stackHTML()+(two?pgHTML(v[0],'l',v)+pgHTML(v[1],'r',v):pgHTML(v[0],'c',v));
+  const v=spread(pos);book.innerHTML=stackHTML()+(two?pgHTML(v[0],'l',ex(v[1]))+pgHTML(v[1],'r',ex(v[0])):pgHTML(v[0],'c'));
   book.style.setProperty('--shift',shiftFor(pos)+'px');
   [pos+1,pos+2,pos+3].forEach(i=>{if(i<=N)new Image().src=PS(i);});
 }
@@ -336,21 +339,24 @@ function finish(){
 function finishNow(){if(srcEl)srcEl.style.visibility='';teardown();}
 
 // ── bending leaf ──
-const STRIPS=()=>innerWidth<760?12:18;
-function makeLeaf(frontI,backI,left){
+const STRIPS=()=>innerWidth<760?16:24;
+function makeLeaf(frontI,backI,left,shF,shB){
   const S=STRIPS(),w=pw/S,lf=document.createElement('div');lf.className='lf';lf.style.left=left+'px';
   const bg=(i,x)=>i>=1&&i<=N?`background-image:url('${PS(i)}');background-size:${pw}px ${ph}px;background-position:${x}px 0`:'';
   let parent=lf;const strips=[];
   for(let i=0;i<S;i++){const s=document.createElement('div');s.className='s';s.style.cssText=`left:${i?w:0}px;width:${w+.6}px`;
-    s.innerHTML=`<b style="${bg(frontI,-i*w)}"><u></u></b><b class="k" style="${bg(backI,-(pw-(i+1)*w))}"><u></u></b>`;
+    // the spine shade is drawn across the strips as one gradient, page-wide, like on the flat pages
+    const g=(on,dir,x)=>on&&i*w<pw*.13?`<i style="background:linear-gradient(to ${dir},rgba(var(--shc),.08),rgba(var(--shc),.025) ${pw*.048}px,transparent ${pw*.12}px) ${x}px 0/${pw}px 100% no-repeat"></i>`:'';
+    s.innerHTML=`<b style="${bg(frontI,-i*w)}">${g(shF,'right',-i*w)}<u></u></b><b class="k" style="${bg(backI,-(pw-(i+1)*w))}">${g(shB,'left',-(pw-(i+1)*w))}<u></u></b>`;
     parent.appendChild(s);parent=s;strips.push(s);}
   // spine shading on the leaf itself, so it matches the pages around it
   const sh=document.createElement('div');
-  strips[0].firstChild.classList.add('sp-r');strips[0].lastChild.classList.add('sp-l');
   const us=strips.map(s=>s.querySelectorAll(':scope>b>u'));
-  return {el:lf,set(p,dir){ // p 0→1: the page lifts from the right and lays down on the left
-    const bend=Math.sin(Math.PI*p)*.42;let prev=0;
-    for(let i=0;i<S;i++){const x=(i+.5)/S;const phi=-180*Math.min(1,p+bend*(1-p)*Math.pow(x,1.7)*(p<.5?1:1-((p-.5)*1.2)));
+  return {el:lf,set(p,cd){ // p 0→1: the page lifts from the right and lays down on the left
+    // cd is the direction the hand is moving (+1 towards the left, -1 back): the free edge always leads
+    const bend=Math.sin(Math.PI*p)*.62;let prev=0;
+    for(let i=0;i<S;i++){const x=(i+.5)/S,lead=bend*Math.pow(x,1.35)*(cd>=0?(1-p):p);
+      const phi=-180*Math.max(0,Math.min(1,p+cd*lead));
       strips[i].style.transform=`rotateY(${(phi-prev).toFixed(2)}deg)`;prev=phi;
       const shade=Math.abs(Math.sin(phi*Math.PI/180));us[i][0].style.opacity=(shade*.14).toFixed(3);us[i][1].style.opacity=(shade*.11).toFixed(3);}
   }};
@@ -359,15 +365,13 @@ function makeLeaf(frontI,backI,left){
 function prepTurn(a,b){
   const va=spread(a),vb=spread(b),cast=document.createElement('div');cast.className='fb-cast';
   let leaf;
-  if(two){book.innerHTML=pgHTML(va[0],'l',[va[0],vb[1]])+pgHTML(vb[1],'r',[va[0],vb[1]]);
-    // the turning page keeps its spine shade only while a page sits opposite it
-    leaf=makeLeaf(va[1],vb[0],pw);cast.style.left=pw+'px';
-    if(va[0]<1)leaf.el.querySelector('.sp-r')?.classList.remove('sp-r');
-    if(vb[1]>N)leaf.el.querySelector('.sp-l')?.classList.remove('sp-l');
+  if(two){book.innerHTML=pgHTML(va[0],'l',true)+pgHTML(vb[1],'r',true);
+    leaf=makeLeaf(va[1],vb[0],pw,ex(va[0]),ex(vb[1]));cast.style.left=pw+'px';
     book.style.setProperty('--shift','0px');
-  }else{book.innerHTML=pgHTML(vb[0],'c',vb);leaf=makeLeaf(va[0],0,0);leaf.el.querySelectorAll('.sp-r,.sp-l').forEach(e=>e.classList.remove('sp-r','sp-l'));}
+  }else{book.innerHTML=pgHTML(vb[0],'c');leaf=makeLeaf(va[0],0,0);}
   book.appendChild(cast);book.appendChild(leaf.el);
-  return p=>{leaf.set(p,1);const lift=Math.sin(Math.PI*p);
+  return (p,cd=1)=>{leaf.set(p,cd);const lift=Math.sin(Math.PI*p);
+
     cast.style.opacity=lift.toFixed(3);cast.style.background=`linear-gradient(to right,rgba(var(--shc),${(.10*lift).toFixed(3)}),rgba(var(--shc),0) ${30+50*(1-p)}%)`;
     if(!two)leaf.el.style.opacity=p<.55?1:Math.max(0,1-(p-.55)/.4);};
 }
@@ -377,7 +381,7 @@ const K=190,C=27;
 Object.defineProperty(window,'turning',{get:()=>!!(T||S),configurable:true});
 function startTurn(dir,v0=0,a,b){
   if(a===undefined){a=dir>0?pos:prevPos(pos);b=dir>0?nextPos(pos):pos;}
-  T={a,b,set:prepTurn(a,b),p:dir>0?0:1,v:v0,target:dir>0?1:0,queue:0};
+  T={a,b,set:prepTurn(a,b),p:dir>0?0:1,v:v0,target:dir>0?1:0,queue:0,cd:dir>0?1:-1};
   if(two)book.style.setProperty('--shift',shiftFor(dir>0?b:a)+'px');
   T.set(T.p);tickStart();
 }
@@ -385,7 +389,8 @@ function startSheet(target){const sh=book.querySelector('.fb-sheet');S={a:sheetA
 function tickStart(){if(!raf){let last=performance.now();const tick=t=>{const dt=Math.min(.032,(t-last)/1000);last=t;step(dt);raf=(T||S)?requestAnimationFrame(tick):0;};raf=requestAnimationFrame(tick);}}
 function step(dt){
   if(T){for(let n=0;n<4;n++){const f=-K*(T.p-T.target)-C*T.v;T.v+=f*dt/4;T.p+=T.v*dt/4;}
-    const p=Math.max(0,Math.min(1,T.p));T.set(p);
+    const want=T.target>T.p?1:-1;T.cd+=(want-T.cd)*Math.min(1,dt*9);
+    const p=Math.max(0,Math.min(1,T.p));T.set(p,T.cd);
     const close=Math.abs(T.p-T.target)<(T.queue?.06:.0015)&&(T.queue||Math.abs(T.v)<.01);
     if(close){const fwd=T.target===1,q=T.queue,v=T.v;pos=fwd?T.b:T.a;T=null;draw();
       if(q>0&&phase==='open'){const dir=fwd?1:-1;if(!(dir>0&&atEnd(pos))&&!(dir<0&&pos<=1)){startTurn(dir,v*.6);T.queue=q-1;}}}}
@@ -414,18 +419,20 @@ let drag=null;
 stage.addEventListener('pointerdown',e=>{if(e.button>0||phase==='closed')return;
   const onDoc=!!e.target.closest('.fb-book');
   if(!onDoc){closeReader();return;}            // outside the document: close straight away
-  drag={x:e.clientX,y:e.clientY,t:performance.now(),id:e.pointerId,p:0,v:0,live:false};});
+  drag={x:e.clientX,y:e.clientY,t:performance.now(),id:e.pointerId,p:0,v:0,live:false,cd:1};});
 stage.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id||phase!=='open')return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;
   if(!drag.live){if(Math.abs(dx)<8||Math.abs(dx)<Math.abs(dy)||T||S)return;const dir=dx<0?1:-1;
     if(mode==='sheet'){drag.sheet=true;drag.a0=sheetA;}
     else{if((dir>0&&atEnd(pos))||(dir<0&&pos<=1)||reduce.matches){drag=null;return;}
-      drag.dir=dir;drag.a=dir>0?pos:prevPos(pos);drag.b=dir>0?nextPos(pos):pos;drag.set=prepTurn(drag.a,drag.b);
+      drag.dir=dir;drag.cd=dir;drag.a=dir>0?pos:prevPos(pos);drag.b=dir>0?nextPos(pos):pos;drag.set=prepTurn(drag.a,drag.b);
       if(two)book.style.setProperty('--shift',shiftFor(dir>0?drag.b:drag.a)+'px');}
     drag.live=true;stage.setPointerCapture(e.pointerId);}
   const now=performance.now(),w=(two?pw*2:pw)*.85;
   if(drag.sheet){const k=Math.max(0,Math.min(1,Math.abs(dx)/(pw*.9)));drag.ang=drag.a0+(drag.a0===0?180:-180)*k;
     book.querySelector('.fb-sheet').style.transform=`translateZ(${Math.abs(Math.sin(drag.ang*Math.PI/180))*70}px) rotateY(${drag.ang}deg)`;}
-  else{const p=drag.dir>0?Math.max(0,Math.min(1,-dx/w)):Math.max(0,Math.min(1,1-dx/w));drag.v=(p-drag.p)/Math.max(1,now-drag.t)*1000;drag.p=p;drag.set(p);}
+  else{const p=drag.dir>0?Math.max(0,Math.min(1,-dx/w)):Math.max(0,Math.min(1,1-dx/w));drag.v=(p-drag.p)/Math.max(1,now-drag.t)*1000;drag.p=p;
+    if(Math.abs(drag.v)>.15)drag.cd+=((drag.v>0?1:-1)-drag.cd)*.35; // the curl follows the hand
+    drag.set(p,drag.cd);}
   drag.t=now;});
 const endDrag=e=>{if(!drag||e.pointerId!==drag.id)return;const d=drag;drag=null;
   if(!d.live){ // a tap: act immediately
@@ -433,7 +440,7 @@ const endDrag=e=>{if(!drag||e.pointerId!==drag.id)return;const d=drag;drag=null;
     const r=visibleRect();request(e.clientX<r.left+r.width/2?-1:1);return;}
   if(d.sheet){sheetA=d.a0;const sh=book.querySelector('.fb-sheet');S={a:d.ang,v:0,target:Math.abs(d.ang-d.a0)>60?(d.a0===0?180:0):d.a0,sh,us:sh.querySelectorAll('u')};tickStart();return;}
   const target=Math.abs(d.v)>1.2?(d.v<0?0:1):(d.p>.5?1:0);
-  T={a:d.a,b:d.b,set:d.set,p:d.p,v:d.v,target,queue:0};tickStart();};
+  T={a:d.a,b:d.b,set:d.set,p:d.p,v:d.v,target,queue:0,cd:d.cd};tickStart();};
 stage.addEventListener('pointerup',endDrag);stage.addEventListener('pointercancel',endDrag);
 R.querySelector('.rd-close').addEventListener('pointerdown',e=>{e.preventDefault();closeReader();});
 R.querySelector('.rd-close').onclick=closeReader;

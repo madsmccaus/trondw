@@ -8,59 +8,21 @@
 <link rel="preload" href="/fonts/EBGaramond-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/v4/site.css">
 <script type="speculationrules">{"prefetch":[{"source":"document","where":{"href_matches":"/v4*"},"eagerness":"moderate"}]}</script>
-<style>
-.page{max-width:42rem;margin:0 auto;padding:0 1.5rem}
-main{padding-top:2.5rem}
-.years{display:flex;flex-wrap:wrap;justify-content:center;gap:.25rem;font-family:var(--sans);font-size:.9rem;font-weight:500;margin:0 0 1rem}
-.years a{border-radius:6px;padding:.4rem .65rem}
-.years a:hover{background:var(--hover)}
-.count{text-align:center;font-family:var(--sans);font-size:.9rem;color:var(--mute);margin:0 0 3rem}
-.year{content-visibility:auto;contain-intrinsic-size:auto 2400px;scroll-margin-top:1.5rem;margin:0 0 3.5rem}
-.year h2{font-size:1.8rem;font-weight:500;line-height:1.2;margin:0 0 1.25rem}
-.year ol{list-style:none;margin:0;padding:0}
-.year li{display:grid;grid-template-columns:9.5rem 1fr;gap:1rem;align-items:baseline;padding:.5rem 0}
-.year .d{font-family:var(--sans);font-size:.85rem;font-weight:500;color:var(--mute);font-variant-numeric:tabular-nums}
-.year a{font-size:1.15rem;line-height:1.35;text-wrap:balance;background:linear-gradient(currentColor,currentColor) 0 100%/0 1px no-repeat;transition:background-size .3s ease}
-.year a:hover{background-size:100% 1px}
-@media(max-width:600px){.page{padding:0 1.15rem}.year li{grid-template-columns:1fr;gap:.1rem;padding:.6rem 0}}
-@media (prefers-reduced-motion:reduce){.year a{transition:none}}
-</style>
+<link rel="stylesheet" href="/v4/app.css">
+<script src="/lib/sanitize.js"></script>
+<script src="/tw.js"></script>
 <script src="/v4/site.js" defer></script>
+<script src="/v4/app.js" defer></script>
 </head>
 <body>
 <header class="site-head">
   <a class="mast" href="/v4">Trond Worren</a>
   <p class="tag">Tidligere tigger, uteligger.</p>
-  <nav class="site-nav" aria-label="Hovedmeny">
-    <a href="/v4">Forside</a><a href="/v4/arkiv" aria-current="page">Arkiv</a><a href="/v4/dokumenter">Dokumenter</a>
-    <span class="sep" aria-hidden="true"></span>
-    <button class="theme" id="theme" type="button" role="switch" aria-checked="false" aria-label="Mørk modus"><span class="track"><span class="thumb"></span></span></button>
-  </nav>
+  <nav class="site-nav" aria-label="Hovedmeny"><a href="/v4">Forside</a><a href="/v4/arkiv" aria-current="page">Arkiv</a><a href="/v4/boker">Bøker</a><a href="/v4/om">Om</a></nav>
 </header>
 <div class="page">
-  <main>
-    <h1 class="sr">Arkiv</h1>
-    <nav class="years" id="years" aria-label="År"></nav>
-    <p class="count" id="count"></p>
-    <div id="list"></div>
-  </main>
-  <footer class="site">Alt innhold tilhører Trond Worren</footer>
+  <main id="root"></main>
+  <footer class="site"><p>Alt innhold tilhører Trond Worren</p><button class="theme" id="theme" type="button" role="switch" aria-checked="false" aria-label="Mørk modus"><span class="track"><span class="thumb"></span></span></button></footer>
 </div>
-<script>
-const MNF=['januar','februar','mars','april','mai','juni','juli','august','september','oktober','november','desember'];
-const fDate=d=>{const t=new Date(d+'T12:00:00');return `${t.getDate()}. ${MNF[t.getMonth()]} ${t.getFullYear()}`;};
-const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-const fmt=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g,'\u00a0');
-fetch('/data/titles.json').then(r=>r.json()).then(rows=>{
-  rows=rows.filter(r=>r[1]<'2026').sort((a,b)=>b[1].localeCompare(a[1])||b[0]-a[0]);
-  const by={};rows.forEach(r=>(by[r[1].slice(0,4)]=by[r[1].slice(0,4)]||[]).push(r));
-  const ys=Object.keys(by).sort().reverse();
-  document.getElementById('years').innerHTML=ys.map(y=>`<a href="#y${y}">${y}</a>`).join('');
-  document.getElementById('count').textContent=`${fmt(rows.length)} innlegg fra ${ys[ys.length-1]}–${ys[0]}`;
-  document.getElementById('list').innerHTML=ys.map(y=>`<section class="year" id="y${y}" aria-labelledby="h${y}"><h2 id="h${y}">${y}</h2><ol>${
-    by[y].map(r=>`<li><span class="d">${fDate(r[1])}</span><a href="/v4?m=${r[3]}&amp;i=${r[0]}">${esc(r[2])}</a></li>`).join('')}</ol></section>`).join('');
-  if(location.hash){const t=document.querySelector(location.hash);if(t)t.scrollIntoView();}
-});
-</script>
 </body>
 </html>

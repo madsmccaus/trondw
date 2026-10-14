@@ -19,5 +19,12 @@
       "source": "/(.*)",
       "destination": "/$1"
     }
+  ],
+  "redirects": [
+    {
+      "source": "/v4/dokumenter",
+      "destination": "/v4/boker",
+      "permanent": true
+    }
   ]
 }
