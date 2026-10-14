@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arkiv · Trond Worren</title>
+<link rel="preload" href="/fonts/EBGaramond-var.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:'EB Garamond';src:url('/fonts/EBGaramond-var.woff2') format('woff2');font-weight:400 700;font-style:normal;font-display:swap}
+@font-face{font-family:'EB Garamond';src:url('/fonts/EBGaramond-Italic-var.woff2') format('woff2');font-weight:400 700;font-style:italic;font-display:swap}
+:root{
+  --paper:#f6f1e8; --ink:#1c1915; --mute:#5a5248; --accent:#8c3d16; --sheet:#fffdf8;
+  --serif:'EB Garamond',Georgia,'Times New Roman',serif;
+  --sans:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{font-size:18px;-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);line-height:1.55}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.page{max-width:76rem;margin:0 auto;padding:0 2rem}
+header{display:flex;align-items:baseline;justify-content:space-between;gap:1.5rem;flex-wrap:wrap;padding:2.25rem 0 0}
+.mast{font-size:1.6rem;font-weight:500;line-height:1.1}
+nav{display:flex;gap:1.5rem;font-family:var(--sans);font-size:.9rem;font-weight:500}
+nav a{border-bottom:1px solid transparent;padding-bottom:1px}
+nav a:hover,nav a[aria-current="page"]{border-bottom-color:var(--ink)}
+h1{font-size:clamp(2.2rem,4.5vw,3rem);font-weight:500;line-height:1.1;margin:3.5rem 0 0;text-wrap:balance}
+/* feature */
+.feature{display:grid;grid-template-columns:minmax(0,26rem) minmax(0,1fr);gap:4rem;align-items:center;margin:2.5rem 0 5.5rem}
+.feature .cover{display:block;width:100%;aspect-ratio:var(--ar,0.707);background:var(--sheet);box-shadow:0 1px 2px rgba(28,25,21,.08),0 12px 32px rgba(28,25,21,.12);border:0;padding:0;cursor:zoom-in;overflow:hidden}
+.feature .cover img{display:block;width:100%;height:100%;object-fit:cover;transition:opacity .25s ease}
+.feature .meta{max-width:32rem}
+.feature .date{font-family:var(--sans);font-size:.9rem;font-weight:500;color:var(--mute);margin:0 0 .6rem}
+.feature h2{font-size:clamp(1.7rem,3vw,2.2rem);font-weight:500;line-height:1.2;margin:0 0 2rem;text-wrap:balance}
+.actions{display:flex;gap:.75rem;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:.5rem;height:2.6rem;padding:0 1.1rem;border-radius:6px;font-family:var(--sans);font-size:.9rem;font-weight:500;border:1px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer;transition:background .15s,color .15s}
+.btn:hover{background:#3a332b;border-color:#3a332b}
+.btn.ghost{background:transparent;color:var(--ink);border-color:rgba(28,25,21,.35)}
+.btn.ghost:hover{background:rgba(28,25,21,.06)}
+/* browse */
+.browse-head{display:flex;align-items:baseline;justify-content:space-between;gap:1.5rem;flex-wrap:wrap;margin:0 0 1.75rem}
+.browse-head h2{font-size:1.7rem;font-weight:500;margin:0}
+.years{display:flex;flex-wrap:wrap;gap:.25rem;font-family:var(--sans);font-size:.9rem;font-weight:500}
+.years button{font:inherit;color:var(--ink);background:none;border:0;border-radius:6px;padding:.4rem .65rem;cursor:pointer}
+.years button:hover{background:rgba(28,25,21,.06)}
+.years button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(10.5rem,1fr));gap:2.25rem 1.75rem}
+.grid li{margin:0}
+.grid button{display:block;width:100%;border:0;padding:0;background:none;text-align:left;cursor:pointer;color:inherit}
+.thumb{display:block;width:100%;aspect-ratio:var(--ar,0.707);background:var(--sheet);box-shadow:0 1px 2px rgba(28,25,21,.08),0 6px 16px rgba(28,25,21,.08);overflow:hidden;transition:transform .25s ease,box-shadow .25s ease}
+.thumb img{display:block;width:100%;height:100%;object-fit:cover}
+.grid button:hover .thumb{transform:translateY(-3px);box-shadow:0 2px 4px rgba(28,25,21,.1),0 12px 24px rgba(28,25,21,.12)}
+.cap{display:block;margin-top:.6rem;font-family:var(--sans);font-size:.85rem;font-weight:500;color:var(--mute)}
+.more{display:flex;justify-content:center;margin:3rem 0 0}
+.count{font-family:var(--sans);font-size:.9rem;color:var(--mute);margin:1rem 0 0;text-align:center}
+footer.site{padding:5rem 0 3rem;font-family:var(--sans);font-size:.85rem;color:var(--mute)}
+/* viewer */
+dialog{width:min(64rem,100vw - 2rem);height:min(92vh,100dvh - 2rem);max-width:none;max-height:none;padding:0;border:0;border-radius:8px;background:var(--paper);color:var(--ink);box-shadow:0 24px 64px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(28,25,21,.62)}
+.vw{display:grid;grid-template-rows:auto 1fr;height:100%}
+.vw-bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.75rem 1rem .75rem 1.25rem;border-bottom:1px solid rgba(28,25,21,.14)}
+.vw-title{min-width:0}
+.vw-title .date{font-family:var(--sans);font-size:.85rem;font-weight:500;color:var(--mute)}
+.vw-title .t{font-size:1.15rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vw-ctl{display:flex;gap:.4rem;flex-shrink:0}
+.icon{width:2.4rem;height:2.4rem;justify-content:center;padding:0}
+.vw-body{position:relative;background:#e9e3d7;min-height:0}
+.vw-body iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.vw-body .img{position:absolute;inset:0;overflow:auto;display:flex;justify-content:center;padding:1.5rem}
+.vw-body .img img{max-width:100%;height:auto;align-self:flex-start;box-shadow:0 6px 20px rgba(28,25,21,.15)}
+.vw-note{position:absolute;left:0;right:0;bottom:0;padding:.7rem 1.25rem;background:var(--paper);font-family:var(--sans);font-size:.85rem;color:var(--mute);border-top:1px solid rgba(28,25,21,.14)}
+.vw-note a{color:var(--accent);border-bottom:1px solid currentColor}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (prefers-reduced-motion:reduce){.thumb,.feature .cover img{transition:none}}
+@media(max-width:760px){
+  .page{padding:0 1.15rem}
+  h1{margin-top:2.25rem}
+  .feature{grid-template-columns:1fr;gap:1.75rem;margin:1.75rem 0 4rem}
+  .feature .cover{max-width:20rem;margin:0 auto}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:1.75rem 1rem}
+  dialog{width:100vw;height:100dvh;border-radius:0}
+}
+</style>
+<script src="/lib/sanitize.js"></script>
+</head>
+<body>
+<div class="page">
+  <header>
+    <a class="mast" href="/v4">Trond Worren</a>
+    <nav aria-label="Hovedmeny"><a href="/v4">Forside</a><a href="/v4/arkiv" aria-current="page">Arkiv</a></nav>
+  </header>
+  <h1>Arkiv</h1>
+  <section class="feature" id="feature" aria-label="Tilfeldig dokument"></section>
+  <section aria-labelledby="alle">
+    <div class="browse-head">
+      <h2 id="alle">Alle dokumenter</h2>
+      <div class="years" id="years" role="group" aria-label="År"></div>
+    </div>
+    <ul class="grid" id="grid"></ul>
+    <p class="count" id="count"></p>
+    <div class="more"><button class="btn ghost" id="more" hidden>Vis flere</button></div>
+    <div id="sentinel" aria-hidden="true"></div>
+  </section>
+  <footer class="site">Alt innhold tilhører Trond Worren</footer>
+</div>
+
+<dialog id="viewer" aria-labelledby="vwT">
+  <div class="vw">
+    <div class="vw-bar">
+      <div class="vw-title"><div class="date" id="vwD"></div><div class="t" id="vwT"></div></div>
+      <div class="vw-ctl">
+        <button class="btn ghost icon" id="vwPrev" aria-label="Forrige dokument">←</button>
+        <button class="btn ghost icon" id="vwNext" aria-label="Neste dokument">→</button>
+        <button class="btn ghost" id="vwClose">Lukk</button>
+      </div>
+    </div>
+    <div class="vw-body" id="vwB"></div>
+  </div>
+</dialog>
+
+<script>
+const MNF=['januar','februar','mars','april','mai','juni','juli','august','september','oktober','november','desember'];
+const fDate=d=>{const t=new Date(d+'T12:00:00');return `${t.getDate()}. ${MNF[t.getMonth()]} ${t.getFullYear()}`;};
+const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const title=t=>TWSanitize.sanitizeSubject(t)||'Uten tittel';
+const src=(d,w)=>`/covers/${d.id}-${w}.webp`;
+const BATCH=48;
+let DOCS=[],view=[],shown=0,year=null,cur=-1,list=[];
+
+function feature(d){
+  const el=document.getElementById('feature');
+  el.innerHTML=`
+    <button class="cover" style="--ar:${d.w}/${d.h}" id="fOpen" aria-label="Åpne ${esc(title(d.t))}">
+      <img src="${src(d,720)}" srcset="${src(d,360)} 360w, ${src(d,720)} 720w" sizes="(max-width:760px) 20rem, 26rem" width="${d.w}" height="${d.h}" alt="">
+    </button>
+    <div class="meta">
+      <p class="date">${fDate(d.d)}</p>
+      <h2>${esc(title(d.t))}</h2>
+      <div class="actions">
+        <button class="btn" id="fRead">Bla i dokumentet</button>
+        <button class="btn ghost" id="fNew">Vis et annet</button>
+      </div>
+    </div>`;
+  const open=()=>openViewer(DOCS,DOCS.indexOf(d));
+  document.getElementById('fOpen').onclick=open;
+  document.getElementById('fRead').onclick=open;
+  document.getElementById('fNew').onclick=()=>feature(pick(d));
+}
+function pick(not){let d;do{d=DOCS[Math.floor(Math.random()*DOCS.length)];}while(DOCS.length>1&&d===not);return d;}
+
+function years(){
+  const ys=[...new Set(DOCS.map(d=>d.d.slice(0,4)))].sort();
+  const el=document.getElementById('years');
+  el.innerHTML=[`<button aria-pressed="true" data-y="">Alle</button>`,...ys.map(y=>`<button aria-pressed="false" data-y="${y}">${y}</button>`)].join('');
+  el.onclick=e=>{const b=e.target.closest('button');if(!b)return;year=b.dataset.y||null;
+    el.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));reset();};
+}
+function reset(){view=year?DOCS.filter(d=>d.d.startsWith(year)):DOCS;shown=0;document.getElementById('grid').innerHTML='';render();}
+function render(){
+  const next=view.slice(shown,shown+BATCH);
+  document.getElementById('grid').insertAdjacentHTML('beforeend',next.map((d,k)=>`
+    <li><button data-k="${shown+k}" aria-label="${esc(title(d.t))}, ${fDate(d.d)}">
+      <span class="thumb" style="--ar:${d.w}/${d.h}"><img loading="lazy" decoding="async" src="${src(d,360)}" srcset="${src(d,360)} 360w, ${src(d,720)} 720w" sizes="(max-width:760px) 45vw, 12rem" width="${d.w}" height="${d.h}" alt=""></span>
+      <span class="cap">${fDate(d.d)}</span>
+    </button></li>`).join(''));
+  shown+=next.length;
+  document.getElementById('count').textContent=`${shown} av ${view.length}`;
+  document.getElementById('more').hidden=shown>=view.length;
+}
+document.getElementById('grid').onclick=e=>{const b=e.target.closest('button[data-k]');if(b)openViewer(view,+b.dataset.k);};
+document.getElementById('more').onclick=render;
+new IntersectionObserver(es=>{if(es[0].isIntersecting&&shown&&shown<view.length)render();},{rootMargin:'800px'}).observe(document.getElementById('sentinel'));
+
+const dlg=document.getElementById('viewer');
+function openViewer(arr,i){list=arr;cur=i;show();if(!dlg.open)dlg.showModal();}
+function show(){
+  const d=list[cur];
+  document.getElementById('vwD').textContent=fDate(d.d);
+  document.getElementById('vwT').textContent=title(d.t);
+  document.getElementById('vwPrev').disabled=cur<=0;
+  document.getElementById('vwNext').disabled=cur>=list.length-1;
+  document.getElementById('vwB').innerHTML=d.pdf
+    ?`<iframe src="https://drive.google.com/file/d/${encodeURIComponent(d.pdf)}/preview" title="${esc(title(d.t))}" allow="autoplay"></iframe>`
+    :`<div class="img"><img src="${src(d,720)}" alt="${esc(title(d.t))}"></div>`;
+}
+document.getElementById('vwPrev').onclick=()=>{if(cur>0){cur--;show();}};
+document.getElementById('vwNext').onclick=()=>{if(cur<list.length-1){cur++;show();}};
+document.getElementById('vwClose').onclick=()=>dlg.close();
+dlg.addEventListener('close',()=>{document.getElementById('vwB').innerHTML='';});
+dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close();});
+document.addEventListener('keydown',e=>{if(!dlg.open)return;if(e.key==='ArrowLeft')document.getElementById('vwPrev').click();if(e.key==='ArrowRight')document.getElementById('vwNext').click();});
+
+fetch('/data/documents.json').then(r=>r.json()).then(d=>{DOCS=d;feature(pick());years();reset();});
+</script>
+</body>
+</html>
