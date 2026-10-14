@@ -1,4 +1,4 @@
-// Shared helpers for the classic pages
+// Kept for the classic / and /innlegg pages
 const TW = {
   MNF: ['januar','februar','mars','april','mai','juni','juli','august','september','oktober','november','desember'],
   CL: {dagbok:'Dagbok',dikt:'Dikt',annet:'Annet',forkynnelse:'Forkynnelse',plakat:'Plakat',mirakel:'Mirakel',bok:'Bok',forbonn:'Forbønn'},

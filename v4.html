@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trond Worren</title>
+<style>
+@font-face{font-family:'EB Garamond';src:url('/fonts/EBGaramond-var.woff2') format('woff2');font-weight:400 700;font-style:normal;font-display:swap}
+@font-face{font-family:'EB Garamond';src:url('/fonts/EBGaramond-Italic-var.woff2') format('woff2');font-weight:400 700;font-style:italic;font-display:swap}
+:root{
+  --paper:#f6f1e8; --ink:#1c1915; --mute:#5a5248; --accent:#8c3d16;
+  --serif:'EB Garamond',Georgia,'Times New Roman',serif;
+  --sans:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{font-size:18px;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);font-weight:400;line-height:1.55}
+a{color:inherit;text-decoration:none}
+a:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.page{max-width:42rem;margin:0 auto;padding:0 1.5rem}
+header{padding:4.5rem 0 3rem}
+.mast{font-size:clamp(2.4rem,6vw,3.4rem);font-weight:500;line-height:1.05;letter-spacing:-0.01em;margin:0;text-wrap:balance}
+.tag{margin:.6rem 0 0;font-size:1.15rem;font-style:italic;color:var(--mute);text-wrap:balance}
+nav{margin-top:1.75rem;display:flex;gap:1.5rem;font-family:var(--sans);font-size:.9rem;font-weight:500}
+nav a{color:var(--ink);border-bottom:1px solid transparent;padding-bottom:1px}
+nav a:hover{border-bottom-color:var(--ink)}
+nav a[aria-current="page"]{border-bottom-color:var(--ink)}
+.entry{padding:2.75rem 0}
+.entry + .entry{padding-top:0}
+.date{font-family:var(--sans);font-size:.9rem;font-weight:500;color:var(--mute);margin:0 0 .55rem}
+.title{font-size:1.7rem;font-weight:500;line-height:1.2;letter-spacing:-0.005em;margin:0 0 .8rem;text-wrap:balance}
+.title a{background:linear-gradient(currentColor,currentColor) 0 100%/0 1px no-repeat;transition:background-size .35s ease}
+.title a:hover{background-size:100% 1px}
+.excerpt{font-size:1.2rem;line-height:1.6;color:var(--ink);margin:0 0 1rem;max-width:65ch}
+.more{font-family:var(--sans);font-size:.9rem;font-weight:500;color:var(--accent);border-bottom:1px solid currentColor;padding-bottom:1px}
+.more:hover{color:var(--ink)}
+.sample{font-family:var(--serif);font-size:1em;font-weight:500;font-variant-caps:all-small-caps;letter-spacing:.04em;color:var(--accent)}
+.archive{margin:1rem 0 5rem;padding-top:2.5rem;border-top:1px solid color-mix(in srgb,var(--ink) 18%,transparent)}
+.archive a{font-size:1.35rem;font-weight:500;border-bottom:1px solid currentColor;padding-bottom:2px}
+.archive a:hover{color:var(--accent)}
+.archive p{margin:.5rem 0 0;font-family:var(--sans);font-size:.9rem;color:var(--mute)}
+.back{display:inline-block;font-family:var(--sans);font-size:.9rem;font-weight:500;color:var(--mute);margin:0 0 2rem}
+.back:hover{color:var(--ink)}
+.article .date{margin-bottom:.75rem}
+.article h1{font-size:clamp(2rem,5vw,2.6rem);font-weight:500;line-height:1.15;letter-spacing:-0.01em;margin:0 0 1.75rem;text-wrap:balance}
+.article .body{font-size:1.2rem;line-height:1.65;max-width:65ch}
+.article .body p{margin:0 0 1.1em}
+.empty{padding:3rem 0;font-family:var(--sans);color:var(--mute)}
+footer.site{padding:0 0 4rem;font-family:var(--sans);font-size:.85rem;color:var(--mute)}
+@media(max-width:600px){
+  .page{padding:0 1.15rem}
+  header{padding:3rem 0 2rem}
+  .entry{padding:2rem 0}
+  .title{font-size:1.5rem;max-width:none}
+  .excerpt,.article .body{font-size:1.125rem}
+}
+</style>
+<script src="/lib/sanitize.js"></script>
+<script src="/tw.js"></script>
+</head>
+<body>
+<div class="page">
+  <header>
+    <a class="mast" href="/v4">Trond Worren</a>
+    <p class="tag">Tidligere tigger, uteligger.</p>
+    <nav aria-label="Hovedmeny">
+      <a href="/v4" aria-current="page">Forside</a>
+      <a href="/arkiv">Arkiv</a>
+    </nav>
+  </header>
+  <main id="root"></main>
+  <footer class="site">Alt innhold tilhører Trond Worren</footer>
+</div>
+<script>
+twPage({
+  list: (posts) => posts.map((p) => `
+    <article class="entry">
+      <p class="date">${TW.date(p.d)}${p.sample ? ' · <span class="sample">Eksempel</span>' : ''}</p>
+      <h2 class="title"><a href="${twHref(p)}">${TW.esc(p.t)}</a></h2>
+      <p class="excerpt">${TW.esc(TW.preview(p.x, 280))}</p>
+      <a class="more" href="${twHref(p)}">Les videre →</a>
+    </article>`).join('') + `
+    <section class="archive">
+      <a href="/arkiv">Gå til arkivet →</a>
+      <p>4 486 innlegg fra 2016–2022.</p>
+    </section>`,
+  post: (p) => `
+    <a class="back" href="/v4">← Tilbake til forsiden</a>
+    <article class="article">
+      <p class="date">${TW.date(p.d)}${p.sample ? ' · <span class="sample">Eksempel</span>' : ''}</p>
+      <h1>${TW.esc(p.t)}</h1>
+      <div class="body">${TW.paras(p.x)}</div>
+    </article>
+    <p style="margin:2.5rem 0 4rem"><a class="back" href="/v4">← Tilbake til forsiden</a></p>`
+});
+</script>
+</body>
+</html>
