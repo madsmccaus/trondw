@@ -21,53 +21,9 @@
 const crypto = require('crypto');
 const { Octokit } = require('@octokit/rest');
 
-const SIGNATURE_TOLERANCE_SECONDS = 5 * 60;
+const { sanitizeEmailContent, sanitizeSubject, htmlToText } = require('../lib/sanitize');
 
-function sanitizeEmailContent(text) {
-  if (!text) return '';
-  
-  return text
-    // Remove forwarded message headers
-    .replace(/———-\s*Forwarded message\s*———\s*/gi, '')
-    .replace(/------\s*Forwarded message\s*------\s*/gi, '')
-    .replace(/[-–—]+\s*Videresendt melding\s*[-–—]+\s*/gi, '')
-    
-    // Remove English email headers
-    .replace(/^From:.*$/gm, '')
-    .replace(/^To:.*$/gm, '')
-    .replace(/^Cc:.*$/gm, '')
-    .replace(/^Bcc:.*$/gm, '')
-    .replace(/^Subject:.*$/gm, '')
-    .replace(/^Date:.*$/gm, '')
-    .replace(/^Sent:.*$/gm, '')
-    
-    // Remove Norwegian email headers
-    .replace(/^Sendt:.*$/gm, '')
-    .replace(/^Fra:.*$/gm, '')
-    .replace(/^Til:.*$/gm, '')
-    .replace(/^Kopi:.*$/gm, '')
-    
-    // Remove email addresses
-    .replace(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g, '')
-    .replace(/\[e-post fjernet\]/gi, '')
-    .replace(/mailto:[^\s\]>)]+/gi, '')
-    
-    // Remove common email footers
-    .replace(/Med vennlig hilsen\s*/gi, '')
-    .replace(/Best regards\s*/gi, '')
-    .replace(/--\s*$/gm, '')
-    
-    // Remove recipient lists (lines with multiple commas)
-    .replace(/^[^:\n]*,\s*[^:\n]*,.*$/gm, '')
-    
-    // Remove List-Unsubscribe and similar headers
-    .replace(/^List-[^:]+:.*$/gm, '')
-    .replace(/^X-[^:]+:.*$/gm, '')
-    
-    // Clean up multiple newlines
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
-}
+const SIGNATURE_TOLERANCE_SECONDS = 5 * 60;
 
 // Generate slug from title
 function generateSlug(title) {
@@ -242,19 +198,6 @@ function formatPostDate(input, timeZone = process.env.POST_TIMEZONE || 'Europe/O
   }).format(date);
 }
 
-function htmlToText(html) {
-  return (html || '')
-    .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<\/(p|div|li|h[1-6])>/gi, '\n')
-    .replace(/<[^>]+>/g, '')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'");
-}
-
 // Fetch the full received email (text/html/headers) from Resend
 async function fetchReceivedEmail(emailId, apiKey, fetchImpl = fetch) {
   const response = await fetchImpl(
@@ -329,7 +272,7 @@ function createHandler(deps = {}) {
       if (!meta.email_id) throw new Error('Webhook payload missing email_id');
       const email = await fetchEmail(meta.email_id, apiKey);
 
-      const subject = (email.subject || meta.subject || '').trim() || 'Uten tittel';
+      const subject = sanitizeSubject(email.subject || meta.subject || '') || 'Uten tittel';
       const rawContent = email.text || htmlToText(email.html) || '';
       const cleanContent = sanitizeEmailContent(rawContent);
       if (!cleanContent) {
@@ -345,7 +288,8 @@ function createHandler(deps = {}) {
         x: cleanContent,
         u: '',
         img: [],
-        dr: []
+        dr: [],
+        src: 'email'
       };
 
       const result = await store(post);
@@ -367,6 +311,8 @@ module.exports.config = { api: { bodyParser: false } };
 module.exports.createHandler = createHandler;
 module.exports.verifyWebhookSignature = verifyWebhookSignature;
 module.exports.sanitizeEmailContent = sanitizeEmailContent;
+module.exports.sanitizeSubject = sanitizeSubject;
+module.exports.htmlToText = htmlToText;
 module.exports.extractAddress = extractAddress;
 module.exports.parseAllowedSenders = parseAllowedSenders;
 module.exports.formatPostDate = formatPostDate;
