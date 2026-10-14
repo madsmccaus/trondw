@@ -286,8 +286,11 @@ async function closeReader(){
     while(turning)await new Promise(r=>requestAnimationFrame(r));
     if(mode==='book'&&pos!==1){
       const from=pos;const set=prepTurn(1,from);if(two)book.style.setProperty('--shift',shiftFor(1)+'px');
-      set(1);await spring(1,0,0,p=>set(Math.max(0,Math.min(1,p))),260,32);pos=1;draw();}
-    if(mode==='sheet'&&sheetA!==0){const sh=book.querySelector('.fb-sheet');await spring(sheetA,0,0,a=>{sh.style.transform=`rotateY(${a}deg)`;},240,31);sheetA=0;draw();}
+      set(1);
+      // hand over to the flight as the fold lands, so close reads as one motion
+      await new Promise(res=>{let handed=false;spring(1,0,0,p=>{set(Math.max(0,Math.min(1,p)));if(!handed&&p<.06){handed=true;res();}},260,32).then(()=>{if(phase==='closing'){pos=1;draw();}if(!handed)res();});});
+      pos=1;}
+    if(mode==='sheet'&&sheetA!==0){const sh=book.querySelector('.fb-sheet');spring(sheetA,0,0,a=>{sh.style.transform=`rotateY(${a}deg)`;},240,31);sheetA=0;} // turns back over while it flies
   }else{pos=1;sheetA=0;draw();}
   // 2. the closed document flies back into its card; the card is uncovered only once it has landed
   const t=srcEl&&srcEl.isConnected?srcEl.getBoundingClientRect():null;
@@ -366,7 +369,7 @@ async function flipSheet(dir,from,v0=0){
   turning=true;const start=from??sheetA;const us=sh.querySelectorAll('u');
   await spring(start,target,v0,a=>{const t=Math.abs(Math.sin(a*Math.PI/180));
     sh.style.transform=`translateZ(${(t*70).toFixed(1)}px) rotateY(${a.toFixed(2)}deg) rotateZ(${(t*-1.2).toFixed(2)}deg)`;
-    us[0].style.opacity=us[1].style.opacity=(t*.12).toFixed(3);},120,20);
+    us[0].style.opacity=us[1].style.opacity=(t*.12).toFixed(3);},170,26);
   sheetA=target;turning=false;
 }
 
