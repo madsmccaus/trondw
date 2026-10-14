@@ -65,6 +65,9 @@ footer.site{text-align:center;padding:5rem 0 3rem;font-family:var(--sans);font-s
 /* reader: the document itself travels from its card to the centre of the screen */
 .rd{position:fixed;inset:0;z-index:50;visibility:hidden}
 .rd.on{visibility:visible}
+html{scrollbar-gutter:stable}
+html.rd-lock{overflow:hidden}
+.rd-bg,.rd-meta,.rd-close{opacity:0}
 .rd-bg{position:absolute;inset:0;background:var(--paper);opacity:0}
 .rd-close{position:absolute;top:1rem;right:1.25rem;z-index:5;opacity:0}
 .fb-stage{position:absolute;inset:0;perspective:3400px;user-select:none;-webkit-user-select:none;touch-action:pan-y}
@@ -240,40 +243,72 @@ function visibleRect(){const els=[...book.querySelectorAll('.fb-pg,.fb-sheet')];
 function flyTransform(a,b){const s=stage.getBoundingClientRect();
   fly.style.transformOrigin=`${a.left-s.left}px ${a.top-s.top}px`;
   return `translate(${b.left-a.left}px,${b.top-a.top}px) scale(${b.width/a.width},${b.height/a.height})`;}
-function fadeChrome(on,delay=0){[R.querySelector('.rd-bg'),meta,R.querySelector('.rd-close')].forEach((e,i)=>{
-  e.getAnimations().forEach(a=>a.cancel());
-  e.animate([{opacity:on?0:1},{opacity:on?1:0}],{duration:i?280:380,delay:on?(i?delay+260:0):(i?0:120),easing:on?'ease-out':'ease-in',fill:'forwards'});});}
+// ── open / close: one overlay, transform + opacity only, guarded by a small state machine ──
+let phase='closed',pendingClose=false,cleanup=[];
+const later=(fn,ms)=>{const t=setTimeout(fn,ms);cleanup.push(()=>clearTimeout(t));};
+const chrome=()=>[meta,R.querySelector('.rd-close')];
+function fadeTo(el,to,ms,delay=0){const from=getComputedStyle(el).opacity;el.getAnimations().forEach(a=>a.cancel());
+  const a=el.animate([{opacity:from},{opacity:to}],{duration:ms,delay,easing:'ease-out',fill:'forwards'});
+  a.finished.then(()=>{el.style.opacity=to;a.cancel();}).catch(()=>{});return a;}
+const animDone=(a,ms)=>Promise.race([a.finished.catch(()=>{}),new Promise(r=>later(r,ms+150))]);
+const decoded=(img,ms=400)=>img&&img.decode?Promise.race([img.decode().catch(()=>{}),new Promise(r=>setTimeout(r,ms))]):Promise.resolve();
 
-function openReader(d,el){
-  if(isOpen)return;isOpen=true;busy=true;doc=d;srcEl=el;lastFocus=document.activeElement;
+async function openReader(d,el){
+  if(phase!=='closed')return;phase='opening';pendingClose=false;doc=d;srcEl=el;lastFocus=document.activeElement;
   const m=FLIP[d.id];N=m?m.n:1;ar=m?m.w/m.h:d.w/d.h;
-  pages=m?Array.from({length:N},(_,i)=>`/flip/${d.id}/${i+1}.webp`):[];pages[0]=src(d,720);
+  pages=m?Array.from({length:N},(_,i)=>`/flip/${d.id}/${i+1}.webp`):[];
+  pages[0]=el.currentSrc||src(d,720); // exactly the pixels already on screen
   mode=N>=3?'book':'sheet';pos=1;sheetA=0;
   meta.innerHTML=`<p class="date">${fDate(d.d)}</p><h2 class="t" id="rdT">${esc(title(d.t))}</h2>${!m&&d.pdf?`<a href="https://drive.google.com/file/d/${encodeURIComponent(d.pdf)}/view" target="_blank" rel="noopener">Åpne i Google Drive</a>`:''}`;
   fly.innerHTML='<div class="fb-book" id="fbBook"></div>';book=fly.firstChild;
-  R.classList.add('on');document.documentElement.style.overflow='hidden';layout();
-  const done=()=>{busy=false;R.querySelector('.rd-close').focus({preventScroll:true});};
-  if(reduce.matches){[R.querySelector('.rd-bg'),meta,R.querySelector('.rd-close')].forEach(e=>e.style.opacity=1);done();return;}
-  const a=el.getBoundingClientRect(),b=visibleRect();el.style.visibility='hidden';
-  fly.animate([{transform:flyTransform(b,a)},{transform:'none'}],{duration:FLY_MS,easing:SPRING});
-  fadeChrome(true);setTimeout(done,FLY_MS-200);
+  chrome().forEach(e=>e.style.opacity=0);R.querySelector('.rd-bg').style.opacity=0;
+  R.classList.add('on');document.documentElement.classList.add('rd-lock');layout();
+  await decoded(book.querySelector('img'));
+  const a=el.getBoundingClientRect(),b=visibleRect();
+  el.style.visibility='hidden'; // the flying copy covers it in this same frame
+  if(!reduce.matches){
+    const an=fly.animate([{transform:flyTransform(b,a)},{transform:'none'}],{duration:FLY_MS,easing:SPRING});
+    fadeTo(R.querySelector('.rd-bg'),1,360);chrome().forEach(e=>fadeTo(e,1,280,300));
+    await animDone(an,FLY_MS);
+  }else{R.querySelector('.rd-bg').style.opacity=1;chrome().forEach(e=>e.style.opacity=1);}
+  phase='open';R.querySelector('.rd-close').focus({preventScroll:true});
+  // a hi-res cover replaces the card's image once it is decoded
+  const hi=new Image();hi.src=src(d,720);decoded(hi,3000).then(()=>{if(phase==='open'&&pages[0]!==hi.src){pages[0]=hi.src;const c=book.querySelector('.fb-pg[data-p="1"] img,.fb-sheet .f img');if(c)c.src=hi.src;}});
+  if(pendingClose)closeReader();
 }
-function closeReader(){
-  if(!isOpen)return;busy=true;
-  const finish=()=>{fly.getAnimations().forEach(a=>a.cancel());R.classList.remove('on');document.documentElement.style.overflow='';fly.innerHTML='';
-    [R.querySelector('.rd-bg'),meta,R.querySelector('.rd-close')].forEach(e=>{e.getAnimations().forEach(a=>a.cancel());e.style.opacity='';});
-    if(srcEl)srcEl.style.visibility='';isOpen=false;busy=false;drag=null;if(lastFocus)lastFocus.focus({preventScroll:true});};
+async function closeReader(){
+  if(phase==='opening'){pendingClose=true;return;}
+  if(phase!=='open')return;phase='closing';drag=null;
+  const bg=R.querySelector('.rd-bg');
+  chrome().forEach(e=>fadeTo(e,0,160));
+  if(!reduce.matches){
+    // 1. an open spread folds shut in one motion: the left-hand pages swing back over the cover
+    while(turning)await new Promise(r=>requestAnimationFrame(r));
+    if(mode==='book'&&pos!==1){
+      const from=pos;const set=prepTurn(1,from);if(two)book.style.setProperty('--shift',shiftFor(1)+'px');
+      set(1);await spring(1,0,0,p=>set(Math.max(0,Math.min(1,p))),260,32);pos=1;draw();}
+    if(mode==='sheet'&&sheetA!==0){const sh=book.querySelector('.fb-sheet');await spring(sheetA,0,0,a=>{sh.style.transform=`rotateY(${a}deg)`;},240,31);sheetA=0;draw();}
+  }else{pos=1;sheetA=0;draw();}
+  // 2. the closed document flies back into its card; the card is uncovered only once it has landed
   const t=srcEl&&srcEl.isConnected?srcEl.getBoundingClientRect():null;
+  const visible=t&&t.width&&t.bottom>0&&t.top<innerHeight;
+  await decoded(srcEl);
   if(reduce.matches){finish();return;}
-  fadeChrome(false);
-  const v=visibleRect();
-  if(!t||t.bottom<0||t.top>innerHeight||!t.width){fly.animate([{opacity:1,transform:'none'},{opacity:0,transform:'scale(.96)'}],{duration:320,easing:'ease-in',fill:'forwards'}).onfinish=finish;return;}
-  // fit the current state into the card, keeping its proportions
-  const s=Math.min(t.width/v.width,t.height/v.height),tw=v.width*s,th=v.height*s;
-  const target={left:t.left+(t.width-tw)/2,top:t.top+(t.height-th)/2,width:tw,height:th};
-  const multi=v.width>t.width/t.height*v.height*1.2; // an open spread: let it dissolve into the cover as it lands
-  fly.animate([{transform:'none',opacity:1},{transform:flyTransform(v,target),opacity:multi?0:1}],{duration:FLY_MS-120,easing:SPRING,fill:'forwards'}).onfinish=finish;
-  if(multi&&srcEl){srcEl.style.visibility='';srcEl.animate([{opacity:0},{opacity:0,offset:.45},{opacity:1}],{duration:FLY_MS-120});}
+  fadeTo(bg,0,FLY_MS*.7);
+  let an;
+  if(visible){const v=visibleRect();an=fly.animate([{transform:'none'},{transform:flyTransform(v,t)}],{duration:FLY_MS,easing:SPRING,fill:'forwards'});}
+  else an=fly.animate([{opacity:1,transform:'none'},{opacity:0,transform:'scale(.96)'}],{duration:320,easing:'ease-in',fill:'forwards'});
+  await animDone(an,FLY_MS);
+  finish();
+}
+function finish(){
+  if(srcEl)srcEl.style.visibility='';            // same pixels as the landed copy
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ // remove the overlay only after the card has painted
+    fly.getAnimations().forEach(a=>a.cancel());fly.innerHTML='';fly.style.transformOrigin='';
+    R.classList.remove('on');document.documentElement.classList.remove('rd-lock');
+    [R.querySelector('.rd-bg'),...chrome()].forEach(e=>{e.getAnimations().forEach(a=>a.cancel());e.style.opacity=0;});
+    cleanup.forEach(f=>f());cleanup=[];turning=false;phase='closed';
+    if(lastFocus&&lastFocus.isConnected)lastFocus.focus({preventScroll:true});}));
 }
 
 // ── bending leaf ──
@@ -314,7 +349,7 @@ function prepTurn(a,b){
 }
 let turning=false;
 async function turn(dir,v0=0){
-  if(busy||turning||!isOpen)return;
+  if(phase!=='open'||turning)return;
   if(mode==='sheet')return flipSheet(dir);
   if(dir>0&&atEnd(pos))return;if(dir<0&&pos<=1)return;
   const a=dir>0?pos:prevPos(pos),b=dir>0?nextPos(pos):pos;
@@ -337,7 +372,7 @@ async function flipSheet(dir,from,v0=0){
 
 // ── input: click a page, drag it, or use the arrow keys ──
 let drag=null;
-stage.addEventListener('pointerdown',e=>{if(!isOpen||busy||turning||e.button>0)return;
+stage.addEventListener('pointerdown',e=>{if(phase!=='open'||turning||e.button>0)return;
   const onDoc=!!e.target.closest('.fb-book');drag={x:e.clientX,y:e.clientY,t:performance.now(),onDoc,set:null,id:e.pointerId,p:0,v:0};});
 stage.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id||!drag.onDoc)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;
   if(!drag.set){if(Math.abs(dx)<8||Math.abs(dx)<Math.abs(dy))return;const dir=dx<0?1:-1;
@@ -364,12 +399,12 @@ const endDrag=async e=>{if(!drag||e.pointerId!==drag.id)return;const d=drag;drag
   pos=target===1?d.b:d.a;turning=false;draw();};
 stage.addEventListener('pointerup',endDrag);stage.addEventListener('pointercancel',endDrag);
 R.querySelector('.rd-close').onclick=closeReader;
-document.addEventListener('keydown',e=>{if(!isOpen)return;
+document.addEventListener('keydown',e=>{if(phase==='closed')return;
   if(e.key==='Escape'){e.preventDefault();closeReader();}
   if(e.key==='ArrowRight'){e.preventDefault();turn(1);}
   if(e.key==='ArrowLeft'){e.preventDefault();turn(-1);}
   if(e.key==='Tab'){e.preventDefault();R.querySelector('.rd-close').focus();}});
-addEventListener('resize',()=>{if(isOpen&&!turning)layout();});
+addEventListener('resize',()=>{if(phase==='open'&&!turning)layout();});
 
 Promise.all([fetch('/data/documents.json').then(r=>r.json()),fetch('/flip/manifest.json').then(r=>r.ok?r.json():{}).catch(()=>({}))]).then(([d,f])=>{
   DOCS=d;FLIP=f;
