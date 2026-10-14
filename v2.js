@@ -23,3 +23,9 @@ async function twV2({ list, post }) {
 }
 const twLink = (p) => `${location.pathname}?m=${encodeURIComponent(p.m)}&i=${encodeURIComponent(p.i)}`;
 const twSample = (p) => p.sample ? '<span class="sample">Eksempel · kun forhåndsvisning</span>' : '';
+// v3 helpers
+const twLead = (p) => { const text = typeof p === "string" ? p : (p.sample ? p.x.split(/\n{2,}/).slice(1).join(" ") : p.x); const m = text.replace(/\s+/g,' ').match(/^(.{40,170}?[.!?])\s/); return m ? m[1] : TW.preview(text, 140); };
+const twToday = () => { const t = new Date(); return `${['søndag','mandag','tirsdag','onsdag','torsdag','fredag','lørdag'][t.getDay()]} ${t.getDate()}. ${TW.MNF[t.getMonth()]} ${t.getFullYear()}`; };
+const twShort = (d) => { const t = new Date(d+'T12:00:00'); return `${String(t.getDate()).padStart(2,'0')}.${String(t.getMonth()+1).padStart(2,'0')}.${t.getFullYear()}`; };
+function twReveal(){ const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.12});
+  document.querySelectorAll('.rv').forEach(el=>io.observe(el)); }

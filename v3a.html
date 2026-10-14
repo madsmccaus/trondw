@@ -1,0 +1,75 @@
+<!DOCTYPE html><html lang="no"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Trond Worren</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet"><script src="/lib/sanitize.js"></script><script src="/shell.js"></script><script src="/v2.js"></script>
+<style>
+:root{--ink:#111;--paper:#fbfaf7;--mute:#6d6a63;--rule:#111;--red:#b4271c}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:'Newsreader',Georgia,serif;font-optical-sizing:auto}
+a{color:inherit;text-decoration:none}
+.w{max-width:1320px;margin:0 auto;padding:0 40px}
+.top{display:flex;justify-content:space-between;align-items:center;font:500 .85rem/1 'Inter Tight',sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:18px 0}
+.top nav{display:flex;gap:26px}.top nav a:hover{color:var(--red)}
+.mast{border-top:6px solid var(--rule);border-bottom:1px solid var(--rule);padding:18px 0 10px;position:relative}
+.mast h1{font:400 clamp(4rem,13.5vw,13rem)/.82 'Instrument Serif',serif;letter-spacing:-.035em;margin:0;text-align:center;white-space:nowrap}
+.dl{display:flex;justify-content:space-between;border-bottom:3px double var(--rule);padding:10px 0;font:500 .85rem 'Inter Tight',sans-serif;letter-spacing:.06em;text-transform:uppercase}
+.dl em{font:italic 400 1.15rem 'Instrument Serif',serif;text-transform:none;letter-spacing:0}
+.front{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:0;border-bottom:1px solid var(--rule)}
+.lead{padding:48px 48px 56px 0;border-right:1px solid var(--rule)}
+.kick{font:600 .85rem 'Inter Tight',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-bottom:18px;display:flex;gap:14px;align-items:center}
+.kick::after{content:'';flex:1;height:1px;background:currentColor;opacity:.35}
+.lead h2{font:400 clamp(2.6rem,5vw,4.6rem)/.98 'Instrument Serif',serif;letter-spacing:-.02em;margin:0 0 28px}
+.lead h2 a{background:linear-gradient(currentColor,currentColor) 0 100%/0 1px no-repeat;transition:background-size .5s cubic-bezier(.2,.7,0,1)}.lead h2 a:hover{background-size:100% 1px}
+.lead .body{columns:2 18em;column-gap:40px;column-rule:1px solid #d9d6cf;font-size:1.15rem;line-height:1.62;hyphens:auto}
+.lead .body p{margin:0 0 1em}
+.lead .body p:first-child::first-letter{float:left;font:400 5.6rem/.78 'Instrument Serif',serif;margin:.06em .1em 0 0;color:var(--red)}
+.cont{display:inline-flex;gap:8px;align-items:center;margin-top:16px;font:600 .9rem 'Inter Tight',sans-serif;letter-spacing:.04em;border-bottom:1px solid;padding-bottom:3px}
+.cont span{transition:transform .3s}.cont:hover span{transform:translateX(4px)}
+.side{background:var(--ink);color:#f3f1ec;padding:40px 36px}
+.side .kick{color:#e7b7a0}
+.side ol{list-style:none;margin:0;padding:0;counter-reset:n 1}
+.side li{counter-increment:n;border-top:1px solid #3a3835;padding:20px 0 22px;display:grid;grid-template-columns:52px 1fr;gap:6px}
+.side li::before{content:'Nº ' counter(n);font:500 .85rem 'Inter Tight',sans-serif;color:#9f9a91;padding-top:.45em}
+.side .d{font:italic 400 1rem 'Newsreader',serif;color:#b9b4aa}
+.side h3{font:400 1.7rem/1.08 'Instrument Serif',serif;margin:2px 0 0}
+.side li a:hover h3{color:#e7b7a0}
+.quote{padding:72px 0;border-bottom:1px solid var(--rule);display:grid;grid-template-columns:200px 1fr;gap:40px;align-items:start}
+.quote .k{font:600 .85rem 'Inter Tight',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+.quote blockquote{margin:0;font:italic 400 clamp(2rem,3.6vw,3.3rem)/1.1 'Instrument Serif',serif;letter-spacing:-.01em;max-width:24ch}
+.quote blockquote::before{content:'«'}.quote blockquote::after{content:'»'}
+.arkiv{display:grid;grid-template-columns:200px 1fr auto;gap:40px;align-items:end;padding:56px 0 96px}
+.arkiv .big{font:400 clamp(3rem,7vw,6.5rem)/.9 'Instrument Serif',serif;letter-spacing:-.03em}
+.arkiv p{margin:10px 0 0;font:400 1rem 'Inter Tight',sans-serif;color:var(--mute)}
+.btn{display:inline-flex;align-items:center;gap:10px;height:46px;padding:0 22px;border-radius:999px;background:var(--ink);color:var(--paper);font:600 .95rem 'Inter Tight',sans-serif;transition:background .2s}.btn:hover{background:var(--red)}
+.sample{display:inline-block;font:600 .85rem 'Inter Tight',sans-serif;color:#9a3412;background:#fff1e6;border:1px solid #f3c9a8;border-radius:999px;padding:2px 10px;margin-bottom:14px;letter-spacing:0;text-transform:none}
+.side .sample{background:transparent;color:#f3c9a8;border-color:#6b4a36;margin:0 0 6px}
+/* post */
+.art{max-width:1120px;margin:0 auto;padding:56px 0 96px;display:grid;grid-template-columns:200px minmax(0,680px);gap:56px}
+.art aside{font:500 .9rem 'Inter Tight',sans-serif;color:var(--mute);position:sticky;top:24px;align-self:start;border-top:1px solid var(--rule);padding-top:12px}
+.art aside b{display:block;color:var(--ink);font-weight:600;margin-bottom:4px}
+.art h1{font:400 clamp(2.8rem,6vw,5.4rem)/.96 'Instrument Serif',serif;letter-spacing:-.025em;margin:0 0 36px}
+.art .text{font-size:1.28rem;line-height:1.66}.art .text p{margin:0 0 1.1em}
+.art .text p:first-child::first-letter{float:left;font:400 6rem/.78 'Instrument Serif',serif;margin:.05em .1em 0 0;color:var(--red)}
+.back{font:600 .9rem 'Inter Tight',sans-serif;border-bottom:1px solid;padding-bottom:2px}
+.fin{margin-top:40px;font:italic 400 1.4rem 'Instrument Serif',serif}
+.empty{padding:80px 0;font-family:'Inter Tight',sans-serif}
+.rv{opacity:0;transform:translateY(14px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.7,0,1)}.rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}}
+@media(max-width:900px){.w{padding:0 20px}.top nav{gap:16px}.mast h1{font-size:19vw}.dl span:last-child{display:none}
+.front{grid-template-columns:1fr}.lead{padding:32px 0 40px;border-right:0}.lead .body{columns:1}.side{margin:0 -20px;padding:32px 20px}
+.quote,.arkiv{grid-template-columns:1fr;gap:16px;padding:48px 0}.art{grid-template-columns:1fr;gap:20px;padding:32px 0 64px}.art aside{position:static}}
+</style></head><body><div class="w">
+<div class="top"><a href="/v3a">Trond Worren</a><nav><a href="/v3a">Forside</a><a href="/arkiv">Arkiv</a></nav></div>
+<header class="mast"><a href="/v3a"><h1>Trond Worren</h1></a></header>
+<div class="dl"><em>Tidligere tigger, uteligger.</em><span id="today"></span><span>Oslo · Skrevet for hånd siden 2016</span></div>
+<main id="root"></main></div>
+<script>
+document.getElementById('today').textContent = twToday();
+twV2({
+  list: ([f, ...rest]) => `<section class="front"><article class="lead rv">${twSample(f)}<div class="kick">${TW.date(f.d)}</div>
+      <h2><a href="${twLink(f)}">${TW.esc(f.t)}</a></h2><div class="body">${TW.paras(TW.preview(f.x, 900))}</div>
+      <a class="cont" href="${twLink(f)}">Les hele <span>→</span></a></article>
+    <aside class="side"><div class="kick">Tidligere</div><ol>${rest.map(p => `<li class="rv"><a href="${twLink(p)}">${p.sample?'<span class="sample">Eksempel</span><br>':''}<div class="d">${TW.date(p.d)}</div><h3>${TW.esc(p.t)}</h3></a></li>`).join('')}</ol></aside></section>
+    <section class="quote rv"><div class="k">Fra dagboken</div><blockquote>${TW.esc(twLead(rest[0] || f))}</blockquote></section>
+    <section class="arkiv rv"><div class="quote k" style="padding:0;border:0;display:block">2016 — 2022</div><div><div class="big">Arkivet</div><p>4 486 innlegg og 24 håndskrevne dagbøker.</p></div><a class="btn" href="/arkiv">Åpne arkivet →</a></section>`,
+  post: (p) => `<article class="art"><aside><b>${TW.date(p.d)}</b>Trond Worren<br><br><a class="back" href="/v3a">← Forsiden</a></aside>
+    <div>${twSample(p)}<h1>${TW.esc(p.t)}</h1><div class="text">${TW.paras(p.x)}</div><p class="fin">— T.W.</p><a class="back" href="/v3a">← Tilbake til forsiden</a></div></article>`
+}).then(twReveal);
+</script></body></html>
