@@ -26,11 +26,33 @@ test('cuts quoted reply chains', () => {
   }
 });
 
-test('removes signature blocks, phone numbers and mobile footers', () => {
-  assert.strictEqual(sanitizeEmailContent('Tekst.\n\n-- \nTrond Worren\nTlf 912 34 567\nGate 1, Oslo'), 'Tekst.');
-  assert.strictEqual(sanitizeEmailContent('Tekst.\n\nMed vennlig hilsen\nTrond\n+47 912 34 567'), 'Tekst.');
+test('keeps signatures, names and numbers in prose; drops mobile footers', () => {
+  const sig = 'Tekst.\n\nMed vennlig hilsen\nTrond Worren\nTlf 912 34 567\nKarl Johans gate 1, Oslo';
+  assert.strictEqual(sanitizeEmailContent(sig), sig);
+  assert.strictEqual(sanitizeEmailContent('Ring meg på 91234567 i dag.'), 'Ring meg på 91234567 i dag.');
   assert.strictEqual(sanitizeEmailContent('Tekst.\n\nSendt fra min iPhone'), 'Tekst.');
-  assert.strictEqual(sanitizeEmailContent('Ring meg på 91234567 i dag.'), 'Ring meg på i dag.');
+  assert.strictEqual(sanitizeEmailContent('Tekst.\n\n-- \nTrond\ntrondwor@gmail.com'), 'Tekst.\n\n--\nTrond');
+});
+
+test('numbers on header lines go with the header', () => {
+  assert.strictEqual(sanitizeEmailContent('Fra: Ola 912 34 567 <o@x.no>\nSendt: 12.10.2026 09:00\n\nHei.'), 'Hei.');
+});
+
+test('removes obfuscated addresses', () => {
+  for (const s of ['trondwor at gmail dot com', 'trondwor (at) gmail (dot) com', 'trondwor[at]gmail.com', 'trondwor @ gmail.com', 'ola.n at online punktum no']) {
+    const out = sanitizeEmailContent(`Skriv til ${s} i dag`);
+    assert.strictEqual(out, 'Skriv til i dag', s);
+  }
+  assert.strictEqual(sanitizeEmailContent('Vi møttes at kirken i Hønefoss'), 'Vi møttes at kirken i Hønefoss');
+});
+
+test('removes attribution lines but keeps the prose after the quote', () => {
+  const out = sanitizeEmailContent('Svar.\n\ntor. 12. des. 2019 kl. 21:10 skrev Trond Worren <trondwor>:\n\n> sitert\n\nMer tekst fra Trond.');
+  assert.strictEqual(out, 'Svar.\n\nMer tekst fra Trond.');
+});
+
+test('removes recipient lists', () => {
+  assert.strictEqual(sanitizeEmailContent('Ola <o@x.no>, Kari <k@x.no>; per@y.no\nHei alle.'), 'Hei alle.');
 });
 
 test('keeps ordinary prose with commas, years and page numbers', () => {
@@ -56,6 +78,8 @@ test('keeps years, year ranges and dates that look like long numbers', () => {
   for (const s of ['Skoleåret 2018 2019 var fint.', 'Datert 11.12.2019 i Oslo.', 'Fra 2020-2021.', 'Side 1162 og 1163.']) {
     assert.strictEqual(sanitizeEmailContent(s), s);
   }
-  assert.strictEqual(sanitizeEmailContent('Mob.: 40 45 47 11 hele dagen'), 'Mob.: hele dagen');
-  assert.strictEqual(sanitizeEmailContent('Ring +47 912 34 567.'), 'Ring .');
+});
+
+test('removes inline image content ids', () => {
+  assert.strictEqual(sanitizeEmailContent('Her er den\n[image: cidimage001.png@01D82A3B.5C1E2F00]'), 'Her er den\n[image: ]');
 });
