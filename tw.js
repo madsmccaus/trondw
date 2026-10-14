@@ -12,7 +12,7 @@ const TW = {
   },
   async latest() { const r = await fetch('/data/latest.json', { cache: 'no-cache' }); return r.ok ? r.json() : []; }
 };
-async function twPage({ list, post }) {
+async function twPage({ list, post, any = false }) {
   const root = document.getElementById('root');
   const q = new URLSearchParams(location.search);
   const m = q.get('m'), i = q.get('i');
@@ -21,7 +21,7 @@ async function twPage({ list, post }) {
     let p = all.find((x) => x.m === m && String(x.i) === i);
     if (!p && /^\d{4}-\d{2}$/.test(m)) {
       try {
-        const hit = (await fetch(`/data/${m}.json`).then((r) => r.json())).find((x) => String(x.i) === i && x.src === 'email');
+        const hit = (await fetch(`/data/${m}.json`).then((r) => r.json())).find((x) => String(x.i) === i && (any || x.src === 'email'));
         if (hit) p = TW.clean({ ...hit, m });
       } catch (e) {}
     }

@@ -25,7 +25,7 @@ for (const file of files) {
   const posts = JSON.parse(content);
   
   console.log(`${file}: ${posts.length} posts`);
-  allPosts.push(...posts);
+  allPosts.push(...posts.map((p) => ({ ...p, _m: file.slice(0, 7) })));
 }
 
 // Sort by date ascending (oldest first)
@@ -34,6 +34,14 @@ allPosts.sort((a, b) => a.d.localeCompare(b.d));
 console.log(`\nTotal posts: ${allPosts.length}`);
 console.log(`Date range: ${allPosts[0].d} to ${allPosts[allPosts.length - 1].d}`);
 
+// titles.json: a small list of every written post for the /v4/arkiv index
+{
+  const { sanitizeSubject } = require('./lib/sanitize');
+  const titles = allPosts.map((p) => [p.i, p.d, sanitizeSubject(p.t) || 'Uten tittel', p._m]);
+  fs.writeFileSync(path.join(dataDir, 'titles.json'), JSON.stringify(titles));
+  console.log(`✓ Wrote data/titles.json with ${titles.length} posts`);
+}
+allPosts.forEach((p) => delete p._m);
 // Write index.json
 fs.writeFileSync(outputFile, JSON.stringify(allPosts, null, 2));
 console.log(`\n✓ Created ${outputFile}`);

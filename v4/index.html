@@ -4,27 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Trond Worren</title>
+<script src="/v4/theme.js"></script>
+<link rel="preload" href="/fonts/EBGaramond-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/v4/site.css">
+<script type="speculationrules">{"prefetch":[{"source":"document","where":{"href_matches":"/v4*"},"eagerness":"moderate"}]}</script>
 <style>
-@font-face{font-family:'EB Garamond';src:url('/fonts/EBGaramond-var.woff2') format('woff2');font-weight:400 700;font-style:normal;font-display:swap}
-@font-face{font-family:'EB Garamond';src:url('/fonts/EBGaramond-Italic-var.woff2') format('woff2');font-weight:400 700;font-style:italic;font-display:swap}
-:root{
-  --paper:#f6f1e8; --ink:#1c1915; --mute:#5a5248; --accent:#8c3d16;
-  --serif:'EB Garamond',Georgia,'Times New Roman',serif;
-  --sans:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
-}
-*,*::before,*::after{box-sizing:border-box}
-html{font-size:18px;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);font-weight:400;line-height:1.55}
-a{color:inherit;text-decoration:none}
-a:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 .page{max-width:42rem;margin:0 auto;padding:0 1.5rem}
-header{padding:4.5rem 0 3rem}
-.mast{font-size:clamp(2.4rem,6vw,3.4rem);font-weight:500;line-height:1.05;letter-spacing:-0.01em;margin:0;text-wrap:balance}
-.tag{margin:.6rem 0 0;font-size:1.15rem;font-style:italic;color:var(--mute);text-wrap:balance}
-nav{margin-top:1.75rem;display:flex;gap:1.5rem;font-family:var(--sans);font-size:.9rem;font-weight:500}
-nav a{color:var(--ink);border-bottom:1px solid transparent;padding-bottom:1px}
-nav a:hover{border-bottom-color:var(--ink)}
-nav a[aria-current="page"]{border-bottom-color:var(--ink)}
+main{padding-top:1.5rem}
 .entry{padding:2.75rem 0}
 .entry + .entry{padding-top:0}
 .date{font-family:var(--sans);font-size:.9rem;font-weight:500;color:var(--mute);margin:0 0 .55rem}
@@ -35,7 +21,7 @@ nav a[aria-current="page"]{border-bottom-color:var(--ink)}
 .more{font-family:var(--sans);font-size:.9rem;font-weight:500;color:var(--accent);border-bottom:1px solid currentColor;padding-bottom:1px}
 .more:hover{color:var(--ink)}
 .sample{font-family:var(--serif);font-size:1em;font-weight:500;font-variant-caps:all-small-caps;letter-spacing:.04em;color:var(--accent)}
-.archive{margin:1rem 0 5rem;padding-top:2.5rem;border-top:1px solid color-mix(in srgb,var(--ink) 18%,transparent)}
+.archive{margin:1rem 0 5rem;padding-top:2.5rem;border-top:1px solid var(--rule)}
 .archive a{font-size:1.35rem;font-weight:500;border-bottom:1px solid currentColor;padding-bottom:2px}
 .archive a:hover{color:var(--accent)}
 .archive p{margin:.5rem 0 0;font-family:var(--sans);font-size:.9rem;color:var(--mute)}
@@ -46,10 +32,8 @@ nav a[aria-current="page"]{border-bottom-color:var(--ink)}
 .article .body{font-size:1.2rem;line-height:1.65;max-width:65ch}
 .article .body p{margin:0 0 1.1em}
 .empty{padding:3rem 0;font-family:var(--sans);color:var(--mute)}
-footer.site{padding:0 0 4rem;font-family:var(--sans);font-size:.85rem;color:var(--mute)}
 @media(max-width:600px){
   .page{padding:0 1.15rem}
-  header{padding:3rem 0 2rem}
   .entry{padding:2rem 0}
   .title{font-size:1.5rem;max-width:none}
   .excerpt,.article .body{font-size:1.125rem}
@@ -57,42 +41,83 @@ footer.site{padding:0 0 4rem;font-family:var(--sans);font-size:.85rem;color:var(
 </style>
 <script src="/lib/sanitize.js"></script>
 <script src="/tw.js"></script>
+<script src="/v4/site.js" defer></script>
 </head>
 <body>
+<header class="site-head">
+  <a class="mast" href="/v4">Trond Worren</a>
+  <p class="tag">Tidligere tigger, uteligger.</p>
+  <nav class="site-nav" aria-label="Hovedmeny">
+    <a href="/v4" aria-current="page">Forside</a><a href="/v4/arkiv">Arkiv</a><a href="/v4/dokumenter">Dokumenter</a>
+    <span class="sep" aria-hidden="true"></span>
+    <button class="theme" id="theme" type="button" role="switch" aria-checked="false" aria-label="Mørk modus"><span class="track"><span class="thumb"></span></span></button>
+  </nav>
+</header>
 <div class="page">
-  <header>
-    <a class="mast" href="/v4">Trond Worren</a>
-    <p class="tag">Tidligere tigger, uteligger.</p>
-    <nav aria-label="Hovedmeny">
-      <a href="/v4" aria-current="page">Forside</a>
-      <a href="/v4/arkiv">Arkiv</a>
-    </nav>
-  </header>
   <main id="root"></main>
   <footer class="site">Alt innhold tilhører Trond Worren</footer>
 </div>
 <script>
-twPage({
-  list: (posts) => posts.map((p) => `
+// Home ↔ post without a page load: the title morphs from the list into the article (View Transitions),
+// history and scroll position behave like normal navigation.
+const root=document.getElementById('root');
+const vtn=p=>`t-${String(p.m).replace(/\W/g,'')}-${p.i}`;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)');
+let ALL=null;const extra={};
+async function posts(){if(!ALL)ALL=(await TW.latest()).map(TW.clean).filter(p=>p.x);return ALL;}
+async function find(m,i){const all=await posts();let p=all.find(x=>x.m===m&&String(x.i)===i);if(p)return p;
+  if(!/^\d{4}-\d{2}$/.test(m))return null;
+  if(!extra[m])extra[m]=fetch(`/data/${m}.json`).then(r=>r.ok?r.json():[]).catch(()=>[]);
+  const hit=(await extra[m]).find(x=>String(x.i)===i);return hit?TW.clean({...hit,m}):null;}
+const href=p=>`/v4?m=${encodeURIComponent(p.m)}&i=${encodeURIComponent(p.i)}`;
+const tag=p=>p.sample?' · <span class="sample">Eksempel</span>':'';
+function listHTML(all){return all.map(p=>`
     <article class="entry">
-      <p class="date">${TW.date(p.d)}${p.sample ? ' · <span class="sample">Eksempel</span>' : ''}</p>
-      <h2 class="title"><a href="${twHref(p)}">${TW.esc(p.t)}</a></h2>
-      <p class="excerpt">${TW.esc(TW.preview(p.x, 280))}</p>
-      <a class="more" href="${twHref(p)}">Les videre →</a>
-    </article>`).join('') + `
+      <p class="date">${TW.date(p.d)}${tag(p)}</p>
+      <h2 class="title" style="view-transition-name:${vtn(p)}"><a href="${href(p)}" data-post>${TW.esc(p.t)}</a></h2>
+      <p class="excerpt">${TW.esc(TW.preview(p.x,280))}</p>
+      <a class="more" href="${href(p)}" data-post>Les videre →</a>
+    </article>`).join('')+`
     <section class="archive">
       <a href="/v4/arkiv">Gå til arkivet →</a>
       <p>4 415 innlegg fra 2016–2022.</p>
-    </section>`,
-  post: (p) => `
-    <a class="back" href="/v4">← Tilbake til forsiden</a>
+    </section>`;}
+function backHTML(){const st=history.state||{};
+  return st.from==='arkiv'||(!st.from&&document.referrer&&new URL(document.referrer).pathname==='/v4/arkiv')
+    ?'<a class="back" href="/v4/arkiv" data-back>← Tilbake til arkivet</a>':'<a class="back" href="/v4" data-back>← Tilbake til forsiden</a>';}
+function postHTML(p){return `
+    ${backHTML()}
     <article class="article">
-      <p class="date">${TW.date(p.d)}${p.sample ? ' · <span class="sample">Eksempel</span>' : ''}</p>
-      <h1>${TW.esc(p.t)}</h1>
+      <p class="date">${TW.date(p.d)}${tag(p)}</p>
+      <h1 style="view-transition-name:${vtn(p)}">${TW.esc(p.t)}</h1>
       <div class="body">${TW.paras(p.x)}</div>
     </article>
-    <p style="margin:2.5rem 0 4rem"><a class="back" href="/v4">← Tilbake til forsiden</a></p>`
-});
+    <p style="margin:2.5rem 0 4rem">${backHTML()}</p>`;}
+async function view(){
+  const q=new URLSearchParams(location.search),m=q.get('m'),i=q.get('i');
+  if(m&&i){const p=await find(m,i);if(!p)return()=>{root.innerHTML='<p class="empty">Fant ikke innlegget.</p>';};
+    return()=>{document.title=`${p.t} · Trond Worren`;root.innerHTML=postHTML(p);};}
+  const all=await posts();return()=>{document.title='Trond Worren';root.innerHTML=all.length?listHTML(all):'<p class="empty">Ingen nye innlegg ennå.</p>';};
+}
+function transition(fn){if(!document.startViewTransition||reduce.matches){fn();return;}document.startViewTransition(fn);}
+async function go(url,push){
+  if(push){history.replaceState({...(history.state||{}),y:scrollY},'');}
+  const u=new URL(url,location.href);const prev=location.href;
+  if(push)history.pushState({y:0,from:new URL(prev).search?'post':'home'},'',u);
+  const paint=await view();const y=push?0:(history.state&&history.state.y)||0;
+  transition(()=>{paint();scrollTo(0,y);});
+}
+if('scrollRestoration' in history)history.scrollRestoration='manual';
+document.addEventListener('click',e=>{const a=e.target.closest('a[data-post],a[data-back]');
+  if(!a||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button)return;
+  const u=new URL(a.href);
+  if(u.pathname==='/v4/arkiv'){if(document.referrer&&new URL(document.referrer).pathname==='/v4/arkiv'&&!(history.state&&history.state.from)){e.preventDefault();history.back();}return;}
+  if(u.pathname!=='/v4')return;
+  e.preventDefault();
+  if(a.hasAttribute('data-back')&&history.state&&history.state.from==='home'){history.back();return;}
+  go(u.href,true);});
+addEventListener('popstate',()=>go(location.href,false));
+view().then(paint=>{paint();const y=history.state&&history.state.y;if(y)scrollTo(0,y);});
 </script>
 </body>
 </html>
