@@ -19,41 +19,39 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);
 a{color:inherit;text-decoration:none}
 :focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 .page{max-width:76rem;margin:0 auto;padding:0 2rem}
-header{display:flex;align-items:baseline;justify-content:space-between;gap:1.5rem;flex-wrap:wrap;padding:2.25rem 0 0}
+header{display:flex;flex-direction:column;align-items:center;gap:.9rem;padding:2.75rem 0 0;text-align:center}
 .mast{font-size:1.6rem;font-weight:500;line-height:1.1}
 nav{display:flex;gap:1.5rem;font-family:var(--sans);font-size:.9rem;font-weight:500}
 nav a{border-bottom:1px solid transparent;padding-bottom:1px}
 nav a:hover,nav a[aria-current="page"]{border-bottom-color:var(--ink)}
-h1{font-size:clamp(2.2rem,4.5vw,3rem);font-weight:500;line-height:1.1;margin:3.5rem 0 0;text-wrap:balance}
 /* feature */
-.feature{display:grid;grid-template-columns:minmax(0,26rem) minmax(0,1fr);gap:4rem;align-items:center;margin:2.5rem 0 5.5rem}
-.feature .cover{display:block;width:100%;aspect-ratio:var(--ar,0.707);background:var(--sheet);box-shadow:0 1px 2px rgba(28,25,21,.08),0 12px 32px rgba(28,25,21,.12);border:0;padding:0;cursor:zoom-in;overflow:hidden}
+.feature{display:flex;flex-direction:column;align-items:center;text-align:center;gap:2rem;margin:3.5rem auto 5.5rem;max-width:40rem}
+.feature .cover{display:block;width:min(24rem,100%);aspect-ratio:var(--ar,0.707);background:var(--sheet);box-shadow:0 1px 2px rgba(28,25,21,.08),0 12px 32px rgba(28,25,21,.12);border:0;padding:0;cursor:zoom-in;overflow:hidden}
 .feature .cover img{display:block;width:100%;height:100%;object-fit:cover;transition:opacity .25s ease}
-.feature .meta{max-width:32rem}
+.feature .meta{max-width:36rem}
 .feature .date{font-family:var(--sans);font-size:.9rem;font-weight:500;color:var(--mute);margin:0 0 .6rem}
 .feature h2{font-size:clamp(1.7rem,3vw,2.2rem);font-weight:500;line-height:1.2;margin:0 0 2rem;text-wrap:balance}
-.actions{display:flex;gap:.75rem;flex-wrap:wrap}
+.actions{display:flex;gap:.75rem;flex-wrap:wrap;justify-content:center}
 .btn{display:inline-flex;align-items:center;gap:.5rem;height:2.6rem;padding:0 1.1rem;border-radius:6px;font-family:var(--sans);font-size:.9rem;font-weight:500;border:1px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer;transition:background .15s,color .15s}
 .btn:hover{background:#3a332b;border-color:#3a332b}
 .btn.ghost{background:transparent;color:var(--ink);border-color:rgba(28,25,21,.35)}
 .btn.ghost:hover{background:rgba(28,25,21,.06)}
 /* browse */
-.browse-head{display:flex;align-items:baseline;justify-content:space-between;gap:1.5rem;flex-wrap:wrap;margin:0 0 1.75rem}
-.browse-head h2{font-size:1.7rem;font-weight:500;margin:0}
-.years{display:flex;flex-wrap:wrap;gap:.25rem;font-family:var(--sans);font-size:.9rem;font-weight:500}
+.browse-head{display:flex;justify-content:center;margin:0 0 2rem}
+.years{display:flex;flex-wrap:wrap;justify-content:center;gap:.25rem;font-family:var(--sans);font-size:.9rem;font-weight:500}
 .years button{font:inherit;color:var(--ink);background:none;border:0;border-radius:6px;padding:.4rem .65rem;cursor:pointer}
 .years button:hover{background:rgba(28,25,21,.06)}
 .years button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
-.grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(10.5rem,1fr));gap:2.25rem 1.75rem}
+.grid{list-style:none;margin:0 auto;padding:0;max-width:72rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(10.5rem,1fr));gap:2.25rem 1.75rem}
 .grid li{margin:0}
 .grid button{display:block;width:100%;border:0;padding:0;background:none;text-align:left;cursor:pointer;color:inherit}
 .thumb{display:block;width:100%;aspect-ratio:1/1.414;background:var(--sheet);box-shadow:0 1px 2px rgba(28,25,21,.08),0 6px 16px rgba(28,25,21,.08);overflow:hidden;transition:transform .25s ease,box-shadow .25s ease}
 .thumb img{display:block;width:100%;height:100%;object-fit:cover;object-position:top center}
 .grid button:hover .thumb{transform:translateY(-3px);box-shadow:0 2px 4px rgba(28,25,21,.1),0 12px 24px rgba(28,25,21,.12)}
-.cap{display:block;margin-top:.6rem;font-family:var(--sans);font-size:.85rem;font-weight:500;color:var(--mute)}
+.cap{display:block;text-align:center;margin-top:.6rem;font-family:var(--sans);font-size:.85rem;font-weight:500;color:var(--mute)}
 .more{display:flex;justify-content:center;margin:3rem 0 0}
 .count{font-family:var(--sans);font-size:.9rem;color:var(--mute);margin:1rem 0 0;text-align:center}
-footer.site{padding:5rem 0 3rem;font-family:var(--sans);font-size:.85rem;color:var(--mute)}
+footer.site{text-align:center;padding:5rem 0 3rem;font-family:var(--sans);font-size:.85rem;color:var(--mute)}
 /* viewer */
 dialog{width:min(64rem,100vw - 2rem);height:min(92vh,100dvh - 2rem);max-width:none;max-height:none;padding:0;border:0;border-radius:8px;background:var(--paper);color:var(--ink);box-shadow:0 24px 64px rgba(0,0,0,.35)}
 dialog::backdrop{background:rgba(28,25,21,.62)}
@@ -74,9 +72,8 @@ dialog::backdrop{background:rgba(28,25,21,.62)}
 @media (prefers-reduced-motion:reduce){.thumb,.feature .cover img{transition:none}}
 @media(max-width:760px){
   .page{padding:0 1.15rem}
-  h1{margin-top:2.25rem}
-  .feature{grid-template-columns:1fr;gap:1.75rem;margin:1.75rem 0 4rem}
-  .feature .cover{max-width:20rem;margin:0 auto}
+  .feature{gap:1.5rem;margin:2rem auto 4rem}
+  .feature .cover{width:min(20rem,100%)}
   .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:1.75rem 1rem}
   dialog{width:100vw;height:100dvh;border-radius:0}
 }
@@ -89,11 +86,10 @@ dialog::backdrop{background:rgba(28,25,21,.62)}
     <a class="mast" href="/v4">Trond Worren</a>
     <nav aria-label="Hovedmeny"><a href="/v4">Forside</a><a href="/v4/arkiv" aria-current="page">Arkiv</a></nav>
   </header>
-  <h1>Arkiv</h1>
+  <h1 class="sr">Arkiv</h1>
   <section class="feature" id="feature" aria-label="Tilfeldig dokument"></section>
-  <section aria-labelledby="alle">
+  <section aria-label="Alle dokumenter">
     <div class="browse-head">
-      <h2 id="alle">Alle dokumenter</h2>
       <div class="years" id="years" role="group" aria-label="År"></div>
     </div>
     <ul class="grid" id="grid"></ul>

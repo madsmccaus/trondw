@@ -51,3 +51,11 @@ test('html quoted replies and blockquotes are dropped', () => {
   const text = htmlToText('<div>Ny tekst</div><div class="gmail_quote">On … wrote:<blockquote>old a@b.no</blockquote></div>');
   assert.strictEqual(sanitizeEmailContent(text), 'Ny tekst');
 });
+
+test('keeps years, year ranges and dates that look like long numbers', () => {
+  for (const s of ['Skoleåret 2018 2019 var fint.', 'Datert 11.12.2019 i Oslo.', 'Fra 2020-2021.', 'Side 1162 og 1163.']) {
+    assert.strictEqual(sanitizeEmailContent(s), s);
+  }
+  assert.strictEqual(sanitizeEmailContent('Mob.: 40 45 47 11 hele dagen'), 'Mob.: hele dagen');
+  assert.strictEqual(sanitizeEmailContent('Ring +47 912 34 567.'), 'Ring .');
+});
