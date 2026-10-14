@@ -26,8 +26,8 @@ nav a{border-bottom:1px solid transparent;padding-bottom:1px}
 nav a:hover,nav a[aria-current="page"]{border-bottom-color:var(--ink)}
 /* feature */
 .feature{display:flex;flex-direction:column;align-items:center;text-align:center;gap:2rem;margin:3.5rem auto 5.5rem;max-width:44rem}
-.feature .cover{display:block;width:min(30rem,100%);aspect-ratio:var(--ar,0.707);background:var(--sheet);box-shadow:0 1px 2px rgba(28,25,21,.08),0 12px 32px rgba(28,25,21,.12);border:0;padding:0;cursor:zoom-in;overflow:hidden;transition:transform .3s ease,box-shadow .3s ease}
-.feature .cover:hover,.feature .cover:focus-visible{transform:translateY(-4px);box-shadow:0 2px 4px rgba(28,25,21,.1),0 20px 44px rgba(28,25,21,.18)}
+.feature .cover{display:block;width:min(30rem,100%);aspect-ratio:var(--ar,0.707);background:var(--sheet);box-shadow:0 .5px 1px rgba(28,25,21,.05),0 2px 4px rgba(28,25,21,.035),0 8px 18px rgba(28,25,21,.04),0 22px 44px rgba(28,25,21,.035);border:0;padding:0;cursor:pointer;overflow:hidden;transition:transform .3s ease,box-shadow .3s ease}
+.feature .cover:hover,.feature .cover:focus-visible{transform:translateY(-4px);box-shadow:0 1px 2px rgba(28,25,21,.05),0 4px 8px rgba(28,25,21,.04),0 14px 28px rgba(28,25,21,.05),0 32px 60px rgba(28,25,21,.04)}
 .feature .cover:focus-visible{outline:2px solid var(--ink);outline-offset:6px}
 .feature .cover img{display:block;width:100%;height:100%;object-fit:cover;transition:opacity .25s ease}
 .feature .meta{max-width:36rem}
@@ -46,12 +46,12 @@ nav a:hover,nav a[aria-current="page"]{border-bottom-color:var(--ink)}
 .years button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
 .grid{list-style:none;margin:0 auto;padding:0;max-width:72rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(10.5rem,1fr));gap:2.25rem 1.75rem}
 .grid li{margin:0}
-.grid button{display:block;width:100%;border:0;padding:0;background:none;text-align:left;cursor:zoom-in;color:inherit}
+.grid button{display:block;width:100%;border:0;padding:0;background:none;text-align:left;cursor:pointer;color:inherit}
 .grid button:focus-visible{outline:none}
 .grid button:focus-visible .thumb{outline:2px solid var(--ink);outline-offset:4px}
-.thumb{display:block;width:100%;aspect-ratio:1/1.414;background:var(--sheet);box-shadow:0 1px 2px rgba(28,25,21,.08),0 6px 16px rgba(28,25,21,.08);overflow:hidden;transition:transform .25s ease,box-shadow .25s ease}
+.thumb{display:block;width:100%;aspect-ratio:1/1.414;background:var(--sheet);box-shadow:0 .5px 1px rgba(28,25,21,.05),0 2px 4px rgba(28,25,21,.035),0 8px 18px rgba(28,25,21,.04),0 22px 44px rgba(28,25,21,.035);overflow:hidden;transition:transform .25s ease,box-shadow .25s ease}
 .thumb img{display:block;width:100%;height:100%;object-fit:cover;object-position:top center}
-.grid button:hover .thumb,.grid button:focus-visible .thumb{transform:translateY(-3px);box-shadow:0 2px 4px rgba(28,25,21,.1),0 12px 24px rgba(28,25,21,.12)}
+.grid button:hover .thumb,.grid button:focus-visible .thumb{transform:translateY(-3px);box-shadow:0 1px 2px rgba(28,25,21,.05),0 4px 8px rgba(28,25,21,.04),0 14px 28px rgba(28,25,21,.05),0 32px 60px rgba(28,25,21,.04)}
 .cap{display:block;text-align:center;margin-top:.6rem;font-family:var(--sans);font-size:.85rem;font-weight:500;color:var(--mute)}
 .more{display:flex;justify-content:center;margin:3rem 0 0}
 .count{font-family:var(--sans);font-size:.9rem;color:var(--mute);margin:1rem 0 0;text-align:center}
@@ -62,42 +62,55 @@ footer.site{text-align:center;padding:5rem 0 3rem;font-family:var(--sans);font-s
 .grid li.in{animation:rise .6s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0) * 35ms)}
 .feature.in .cover{animation:rise .7s cubic-bezier(.2,.8,.2,1) both}
 .feature.in .meta{animation:rise .7s .08s cubic-bezier(.2,.8,.2,1) both}
-/* reader (no modal: the cover itself travels into the reading position) */
-.rd{position:fixed;inset:0;z-index:50;display:grid;grid-template-rows:auto minmax(0,1fr);grid-template-columns:minmax(0,1fr);visibility:hidden}
+/* reader: the document itself travels from its card to the centre of the screen */
+.rd{position:fixed;inset:0;z-index:50;visibility:hidden}
 .rd.on{visibility:visible}
 .rd-bg{position:absolute;inset:0;background:var(--paper);opacity:0}
-.rd-top{position:relative;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:1rem;padding:1rem 1.25rem .5rem;opacity:0}
-.rd-meta{grid-column:2;text-align:center;min-width:0}
-.rd-meta .date{font-family:var(--sans);font-size:.85rem;font-weight:500;color:var(--mute)}
-.rd-meta .t{font-size:1.2rem;font-weight:500;line-height:1.25;text-wrap:balance}
-.rd-meta a{font-family:var(--sans);font-size:.85rem;color:var(--accent);border-bottom:1px solid currentColor}
-.rd-close{grid-column:3;justify-self:end}
-.fb-stage{position:relative;min-height:0;perspective:2400px;user-select:none;-webkit-user-select:none;touch-action:pan-y;cursor:grab}
-.fb-stage.dragging{cursor:grabbing}
-.fb-book{position:absolute;left:50%;top:50%;width:calc(var(--pw) * var(--cols));height:var(--ph);transform:translate(-50%,-50%)}
-.fb-pg{position:absolute;top:0;width:var(--pw);height:var(--ph);background:var(--sheet);overflow:hidden;box-shadow:0 10px 30px rgba(28,25,21,.16),0 1px 3px rgba(28,25,21,.1)}
+.rd-close{position:absolute;top:1rem;right:1.25rem;z-index:5;opacity:0}
+.fb-stage{position:absolute;inset:0;perspective:3400px;user-select:none;-webkit-user-select:none;touch-action:pan-y}
+.fb-fly{position:absolute;inset:0;transform-style:preserve-3d;pointer-events:none}
+.fb-book{position:absolute;width:calc(var(--pw) * var(--cols));height:var(--ph);transform-style:preserve-3d;pointer-events:auto;cursor:pointer;transform:translateX(var(--shift,0px));transition:transform .75s var(--spring)}
+.fb-pg,.fb-sheet,.fb-stack i{position:absolute;top:0;width:var(--pw);height:var(--ph);background:var(--sheet)}
+.fb-pg{overflow:hidden;box-shadow:var(--paper-shadow)}
 .fb-pg.l{left:0}.fb-pg.r{right:0}.fb-pg.c{left:0}
 .fb-pg.blank{display:none}
-.fb-pg img,.fb-face img{display:block;width:100%;height:100%;object-fit:contain;-webkit-user-drag:none}
-/* spine shading: same gradient on pages and on the turning leaf, so it never jumps */
-.sp-l::after,.sp-r::after{content:"";position:absolute;top:0;bottom:0;width:14%;pointer-events:none}
-.sp-l::after{right:0;background:linear-gradient(to left,rgba(28,25,21,.13),rgba(28,25,21,.04) 35%,transparent)}
-.sp-r::after{left:0;background:linear-gradient(to right,rgba(28,25,21,.13),rgba(28,25,21,.04) 35%,transparent)}
-.fb-leaf{position:absolute;top:0;width:var(--pw);height:var(--ph);transform-style:preserve-3d;z-index:3;will-change:transform}
-.fb-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--sheet);overflow:hidden}
-.fb-face.b{transform:rotateY(180deg)}
-.fb-curl{position:absolute;inset:0;pointer-events:none;z-index:2}
+.fb-pg img{display:block;width:100%;height:100%;object-fit:contain;-webkit-user-drag:none}
+/* soft, layered paper shadow */
+:root{--paper-shadow:0 .5px 1px rgba(28,25,21,.05),0 2px 4px rgba(28,25,21,.035),0 8px 18px rgba(28,25,21,.04),0 22px 44px rgba(28,25,21,.035)}
+/* a few sheets under a closed document: it reads as a stack of paper */
+.fb-stack{position:absolute;top:0;width:var(--pw);height:var(--ph);transition:opacity .3s ease}
+.fb-stack i{left:0;box-shadow:var(--paper-shadow)}
+.fb-stack i:nth-child(1){transform:translate(3px,3px) rotate(.5deg)}
+.fb-stack i:nth-child(2){transform:translate(1.5px,1.5px) rotate(-.35deg)}
+/* spine shading, shared by pages and the bending leaf */
+.sp-l::after,.sp-r::after{content:"";position:absolute;top:0;bottom:0;width:12%;pointer-events:none}
+.sp-l::after{right:0;background:linear-gradient(to left,rgba(28,25,21,.08),rgba(28,25,21,.025) 40%,transparent)}
+.sp-r::after{left:0;background:linear-gradient(to right,rgba(28,25,21,.08),rgba(28,25,21,.025) 40%,transparent)}
+/* bending leaf: nested strips, each turned a little more, give a real curve */
+.lf{position:absolute;top:0;width:var(--pw);height:var(--ph);transform-style:preserve-3d;z-index:3;pointer-events:none}
+.lf .s{position:absolute;top:0;height:var(--ph);transform-origin:left center;transform-style:preserve-3d}
+.lf .s>b{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background-color:var(--sheet);background-repeat:no-repeat}
+.lf .s>b.k{transform:rotateY(180deg)}
+.lf .s>b>u{position:absolute;inset:0;background:#1c1915;opacity:0}
 .fb-cast{position:absolute;top:0;height:var(--ph);width:var(--pw);pointer-events:none;z-index:2;opacity:0}
-@media (prefers-reduced-motion:reduce){.thumb,.feature .cover,.feature .cover img{transition:none}.grid button:hover .thumb,.grid button:focus-visible .thumb,.feature .cover:hover,.feature .cover:focus-visible{transform:none}.grid li.in,.feature.in .cover,.feature.in .meta{animation:none}}
+/* single sheet (1–2 pages): turns over on its own axis */
+.fb-sheet{left:0;transform-style:preserve-3d;box-shadow:none}
+.fb-sheet>div{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--sheet);overflow:hidden;box-shadow:var(--paper-shadow)}
+.fb-sheet>div img{display:block;width:100%;height:100%;object-fit:contain;-webkit-user-drag:none}
+.fb-sheet>div.k{transform:rotateY(180deg)}
+.fb-sheet>div>u{position:absolute;inset:0;background:#1c1915;opacity:0;pointer-events:none}
+.rd-meta{position:absolute;left:50%;width:min(36rem,calc(100% - 2rem));transform:translateX(-50%);text-align:center;opacity:0}
+.rd-meta .date{font-family:var(--sans);font-size:.85rem;font-weight:500;color:var(--mute);margin:0 0 .3rem}
+.rd-meta .t{font-size:1.25rem;font-weight:500;line-height:1.25;text-wrap:balance;margin:0}
+.rd-meta a{display:inline-block;margin-top:.5rem;font-family:var(--sans);font-size:.85rem;color:var(--accent);border-bottom:1px solid currentColor}
+@media (prefers-reduced-motion:reduce){.fb-book{transition:none}.thumb,.feature .cover,.feature .cover img{transition:none}.grid button:hover .thumb,.grid button:focus-visible .thumb,.feature .cover:hover,.feature .cover:focus-visible{transform:none}.grid li.in,.feature.in .cover,.feature.in .meta{animation:none}}
 @media(max-width:760px){
   .page{padding:0 1.15rem}
   .feature{gap:1.5rem;margin:2rem auto 4rem}
   .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:1.75rem 1rem}
   .feature .cover{width:min(22rem,100%)}
-  .rd-top{grid-template-columns:1fr auto;padding:.75rem 1rem .25rem}
-  .rd-meta{grid-column:1;text-align:left}
-  .rd-close{grid-column:2}
-  .rd-meta .t{font-size:1.05rem}
+  .rd-meta .t{font-size:1.1rem}
+  .rd-close{top:.75rem;right:1rem}
 }
 </style>
 <script src="/lib/sanitize.js"></script>
@@ -124,11 +137,9 @@ footer.site{text-align:center;padding:5rem 0 3rem;font-family:var(--sans);font-s
 
 <div class="rd" id="reader" role="dialog" aria-modal="true" aria-labelledby="rdT">
   <div class="rd-bg"></div>
-  <div class="rd-top">
-    <div class="rd-meta"><div class="date" id="rdD"></div><div class="t" id="rdT"></div><div id="rdL"></div></div>
-    <button class="btn ghost rd-close" id="rdClose">Lukk</button>
-  </div>
-  <div class="fb-stage" id="fbStage" aria-live="polite"><div class="fb-book" id="fbBook"></div></div>
+  <div class="fb-stage" id="fbStage" aria-live="polite"><div class="fb-fly" id="fbFly"></div><div class="rd-meta" id="rdMeta"></div></div>
+  <button class="btn ghost rd-close" id="rdClose">Lukk</button>
+</div>
 </div>
 
 <script>
@@ -178,149 +189,187 @@ document.getElementById('grid').onclick=e=>{const b=e.target.closest('button[dat
 document.getElementById('more').onclick=render;
 new IntersectionObserver(es=>{if(es[0].isIntersecting&&shown&&shown<view.length)render();},{rootMargin:'800px'}).observe(document.getElementById('sentinel'));
 
-// ── Reader: FLIP from the clicked cover into a flipbook, spring easing, drag-to-turn ──
+// ── Reader ───────────────────────────────────────────────────────────────
+// A cover click lifts the document from its card to the centre, closed. Flipping
+// (click, drag, arrow keys) opens it into a spread; 1–2 page documents turn over
+// like a single sheet. Closing sends the document back to its card as it is.
 let FLIP={};
 const reduce=matchMedia('(prefers-reduced-motion: reduce)');
-// critically-damped-ish spring sampled into a CSS linear() easing
-const SPRING=(()=>{const k=210,c=26,m=1;let x=0,v=0,pts=[];const dt=1/120;for(let t=0;t<=1.2;t+=dt){const a=(-k*(x-1)-c*v)/m;v+=a*dt;x+=v*dt;pts.push(x);}
-  const step=Math.ceil(pts.length/48);const s=pts.filter((_,i)=>i%step===0).map(p=>p.toFixed(4));s.push('1');
-  try{return CSS.supports('transition-timing-function',`linear(${s.join(',')})`)?`linear(${s.join(',')})`:'cubic-bezier(.2,.9,.25,1)';}catch{return 'cubic-bezier(.2,.9,.25,1)';}})();
-const SPRING_MS=720;
-const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
-const easeOut=t=>1-Math.pow(1-t,3);
+const SPRING=(()=>{const k=180,c=24;let x=0,v=0;const pts=[],dt=1/120;for(let t=0;t<=1;t+=dt){v+=(-k*(x-1)-c*v)*dt;x+=v*dt;pts.push(x);}
+  const step=Math.ceil(pts.length/40),s=pts.filter((_,i)=>i%step===0).map(p=>p.toFixed(4));s.push('1');const e=`linear(${s.join(',')})`;
+  try{return CSS.supports('transition-timing-function',e)?e:'cubic-bezier(.2,.9,.25,1)';}catch{return 'cubic-bezier(.2,.9,.25,1)';}})();
+document.documentElement.style.setProperty('--spring',SPRING);
+const FLY_MS=760;
+// physical spring for page turns, driven per frame so drags hand over their velocity
+function spring(from,to,v0,fn,k=150,c=24){return new Promise(res=>{let x=from,v=v0||0,last=performance.now();
+  const tick=t=>{let dt=Math.min(.032,(t-last)/1000);last=t;
+    for(let n=0;n<4;n++){const a=-k*(x-to)-c*v;v+=a*dt/4;x+=v*dt/4;}
+    if(Math.abs(x-to)<.0015&&Math.abs(v)<.01){fn(to);res();return;}fn(x);requestAnimationFrame(tick);};requestAnimationFrame(tick);});}
 
-const R=document.getElementById('reader'),stage=document.getElementById('fbStage'),book=document.getElementById('fbBook');
-let doc=null,N=0,pages=[],ar=.707,two=false,pos=1,pw=0,ph=0,srcEl=null,anim=false,open=false,lastFocus=null;
-
-function pageSrc(i){return pages[i-1];}
-const img=i=>i>=1&&i<=N?`<img src="${pageSrc(i)}" alt="Side ${i} av ${N}" draggable="false">`:'';
+const R=document.getElementById('reader'),stage=document.getElementById('fbStage'),fly=document.getElementById('fbFly'),meta=document.getElementById('rdMeta');
+let doc=null,N=0,pages=[],ar=.707,mode='book',two=false,pos=1,pw=0,ph=0,srcEl=null,busy=false,isOpen=false,lastFocus=null,book=null,sheetA=0;
+const PS=i=>pages[i-1];
 const spread=p=>two?(p===1?[0,1]:[p,p+1]):[p];
-const atEnd=()=>two?(pos===1?N<2:pos+1>=N):pos>=N;
-function pg(i,side){const sp=two?(side==='l'?' sp-l':' sp-r'):'';return `<div class="fb-pg ${two?side:'c'}${sp}${i<1||i>N?' blank':''}" data-p="${i}">${img(i)}</div>`;}
-function draw(){const v=spread(pos);book.innerHTML=two?pg(v[0],'l')+pg(v[1],'r'):pg(v[0],'c');
-  [pos+1,pos+2,pos+3].forEach(i=>{if(i<=N)new Image().src=pageSrc(i);});}
-function layout(){
-  const r=stage.getBoundingClientRect(),narrow=r.width<760;const padX=narrow?16:64,padY=narrow?14:40;
-  two=!narrow&&N>1;const cols=two?2:1;
-  ph=Math.min(r.height-padY*2,(r.width-padX*2)/(cols*ar));pw=ph*ar;
-  R.style.setProperty('--pw',pw+'px');R.style.setProperty('--ph',ph+'px');R.style.setProperty('--cols',cols);
-  if(two&&pos>1&&pos%2===1)pos--;
-  draw();
+const nextPos=p=>two?(p===1?2:p+2):p+1;
+const prevPos=p=>two?(p===2?1:p-2):p-1;
+const atEnd=p=>two?(p===1?N<2:p+1>=N):p>=N;
+const shiftFor=p=>{if(!two)return 0;const v=spread(p);if(v[0]<1)return -pw/2;if(v[1]>N)return pw/2;return 0;};
+const im=i=>i>=1&&i<=N?`<img src="${PS(i)}" alt="Side ${i} av ${N}" draggable="false">`:'';
+function pgHTML(i,side,v){if(i<1||i>N)return '';let sp='';if(two&&v[0]>=1&&v[1]<=N)sp=side==='l'?' sp-l':' sp-r';return `<div class="fb-pg ${two?side:'c'}${sp}" data-p="${i}">${im(i)}</div>`;}
+function stackHTML(){return N>=3?`<div class="fb-stack" style="${two?'right:0':'left:0'};opacity:${pos===1?1:0}"><i></i><i></i></div>`:'';}
+function draw(){
+  if(mode==='sheet'){book.innerHTML=`<div class="fb-sheet" style="transform:rotateY(${sheetA}deg)"><div class="f">${im(1)}<u></u></div><div class="k">${N>1?im(2):''}<u></u></div></div>`;return;}
+  const v=spread(pos);book.innerHTML=stackHTML()+(two?pgHTML(v[0],'l',v)+pgHTML(v[1],'r',v):pgHTML(v[0],'c',v));
+  book.style.setProperty('--shift',shiftFor(pos)+'px');
+  [pos+1,pos+2,pos+3].forEach(i=>{if(i<=N)new Image().src=PS(i);});
 }
-function coverEl(){return book.querySelector(`.fb-pg[data-p="1"]`);}
+function layout(){
+  const r=stage.getBoundingClientRect(),narrow=r.width<760,metaH=narrow?84:96,top=narrow?60:64,padX=narrow?20:64;
+  two=mode==='book'&&!narrow;const cols=two?2:1;
+  ph=Math.min(r.height-top-metaH-12,(r.width-padX*2)/(cols*ar),narrow?9999:r.height*.78);pw=ph*ar;
+  R.style.setProperty('--pw',pw+'px');R.style.setProperty('--ph',ph+'px');R.style.setProperty('--cols',cols);
+  const bt=top+Math.max(0,(r.height-top-metaH-ph)/2);
+  book.style.left=(r.width-cols*pw)/2+'px';book.style.top=bt+'px';
+  meta.style.top=bt+ph+(narrow?16:22)+'px';
+  if(two&&pos>1&&pos%2===1)pos--;
+  book.style.transition='none';draw();void book.offsetWidth;book.style.transition='';
+}
+function visibleRect(){const els=[...book.querySelectorAll('.fb-pg,.fb-sheet')];const rs=els.map(e=>e.getBoundingClientRect());
+  if(!rs.length)return book.getBoundingClientRect();
+  const l=Math.min(...rs.map(r=>r.left)),t=Math.min(...rs.map(r=>r.top)),rr=Math.max(...rs.map(r=>r.right)),b=Math.max(...rs.map(r=>r.bottom));return {left:l,top:t,width:rr-l,height:b-t,right:rr,bottom:b};}
+function flyTransform(a,b){const s=stage.getBoundingClientRect();
+  fly.style.transformOrigin=`${a.left-s.left}px ${a.top-s.top}px`;
+  return `translate(${b.left-a.left}px,${b.top-a.top}px) scale(${b.width/a.width},${b.height/a.height})`;}
+function fadeChrome(on,delay=0){[R.querySelector('.rd-bg'),meta,R.querySelector('.rd-close')].forEach((e,i)=>{
+  e.getAnimations().forEach(a=>a.cancel());
+  e.animate([{opacity:on?0:1},{opacity:on?1:0}],{duration:i?280:380,delay:on?(i?delay+260:0):(i?0:120),easing:on?'ease-out':'ease-in',fill:'forwards'});});}
 
 function openReader(d,el){
-  if(open||anim)return;open=true;anim=true;doc=d;srcEl=el;lastFocus=document.activeElement;
-  const m=FLIP[d.id];
-  N=m?m.n:1;ar=m?m.w/m.h:d.w/d.h;
-  pages=m?Array.from({length:N},(_,i)=>`/flip/${d.id}/${i+1}.webp`):[src(d,720)];
-  pages[0]=src(d,720); // the cover the reader already sees, so nothing flashes during the flight
-  document.getElementById('rdD').textContent=fDate(d.d);
-  document.getElementById('rdT').textContent=title(d.t);
-  document.getElementById('rdL').innerHTML=!m&&d.pdf?`<a href="https://drive.google.com/file/d/${encodeURIComponent(d.pdf)}/view" target="_blank" rel="noopener">Åpne i Google Drive</a>`:'';
-  pos=1;R.classList.add('on');document.documentElement.style.overflow='hidden';layout();
-  const c=coverEl(),to=c.getBoundingClientRect(),from=el.getBoundingClientRect();
-  el.style.visibility='hidden';
-  const fin=()=>{anim=false;document.getElementById('rdClose').focus({preventScroll:true});if(two&&N>1&&!reduce.matches)setTimeout(()=>turn(1),120);};
-  if(reduce.matches){R.querySelector('.rd-bg').style.opacity=1;R.querySelector('.rd-top').style.opacity=1;fin();return;}
-  const dx=from.left-to.left,dy=from.top-to.top,sx=from.width/to.width,sy=from.height/to.height;
-  c.style.transformOrigin='0 0';
-  c.animate([{transform:`translate(${dx}px,${dy}px) scale(${sx},${sy})`},{transform:'none'}],{duration:SPRING_MS,easing:SPRING});
-  R.querySelector('.rd-bg').animate([{opacity:0},{opacity:1}],{duration:380,easing:'ease-out',fill:'forwards'});
-  R.querySelector('.rd-top').animate([{opacity:0,transform:'translateY(-6px)'},{opacity:1,transform:'none'}],{duration:360,delay:220,easing:'ease-out',fill:'forwards'});
-  setTimeout(fin,SPRING_MS-120);
+  if(isOpen)return;isOpen=true;busy=true;doc=d;srcEl=el;lastFocus=document.activeElement;
+  const m=FLIP[d.id];N=m?m.n:1;ar=m?m.w/m.h:d.w/d.h;
+  pages=m?Array.from({length:N},(_,i)=>`/flip/${d.id}/${i+1}.webp`):[];pages[0]=src(d,720);
+  mode=N>=3?'book':'sheet';pos=1;sheetA=0;
+  meta.innerHTML=`<p class="date">${fDate(d.d)}</p><h2 class="t" id="rdT">${esc(title(d.t))}</h2>${!m&&d.pdf?`<a href="https://drive.google.com/file/d/${encodeURIComponent(d.pdf)}/view" target="_blank" rel="noopener">Åpne i Google Drive</a>`:''}`;
+  fly.innerHTML='<div class="fb-book" id="fbBook"></div>';book=fly.firstChild;
+  R.classList.add('on');document.documentElement.style.overflow='hidden';layout();
+  const done=()=>{busy=false;R.querySelector('.rd-close').focus({preventScroll:true});};
+  if(reduce.matches){[R.querySelector('.rd-bg'),meta,R.querySelector('.rd-close')].forEach(e=>e.style.opacity=1);done();return;}
+  const a=el.getBoundingClientRect(),b=visibleRect();el.style.visibility='hidden';
+  fly.animate([{transform:flyTransform(b,a)},{transform:'none'}],{duration:FLY_MS,easing:SPRING});
+  fadeChrome(true);setTimeout(done,FLY_MS-200);
 }
-async function closeReader(){
-  if(!open||anim)return;anim=true;
-  if(pos!==1&&!reduce.matches){await turnTo(1,two?420:300);} else {pos=1;draw();}
-  const done=()=>{R.classList.remove('on');document.documentElement.style.overflow='';book.innerHTML='';
-    R.querySelectorAll('.rd-bg,.rd-top').forEach(e=>{e.getAnimations().forEach(a=>a.cancel());e.style.opacity='';});
-    if(srcEl)srcEl.style.visibility='';open=false;anim=false;if(lastFocus)lastFocus.focus({preventScroll:true});};
-  const c=coverEl(),from=srcEl&&srcEl.isConnected?srcEl.getBoundingClientRect():null;
-  if(reduce.matches||!c||!from||from.bottom<0||from.top>innerHeight){done();return;}
-  const to=c.getBoundingClientRect();
-  book.querySelectorAll('.fb-pg:not([data-p="1"])').forEach(e=>e.animate([{opacity:1},{opacity:0}],{duration:200,fill:'forwards'}));
-  c.style.transformOrigin='0 0';
-  const a=c.animate([{transform:'none'},{transform:`translate(${from.left-to.left}px,${from.top-to.top}px) scale(${from.width/to.width},${from.height/to.height})`}],{duration:SPRING_MS-80,easing:SPRING,fill:'forwards'});
-  R.querySelector('.rd-top').animate([{opacity:1},{opacity:0}],{duration:180,fill:'forwards'});
-  R.querySelector('.rd-bg').animate([{opacity:1},{opacity:0}],{duration:420,delay:120,easing:'ease-in',fill:'forwards'});
-  a.onfinish=done;
+function closeReader(){
+  if(!isOpen)return;busy=true;
+  const finish=()=>{fly.getAnimations().forEach(a=>a.cancel());R.classList.remove('on');document.documentElement.style.overflow='';fly.innerHTML='';
+    [R.querySelector('.rd-bg'),meta,R.querySelector('.rd-close')].forEach(e=>{e.getAnimations().forEach(a=>a.cancel());e.style.opacity='';});
+    if(srcEl)srcEl.style.visibility='';isOpen=false;busy=false;drag=null;if(lastFocus)lastFocus.focus({preventScroll:true});};
+  const t=srcEl&&srcEl.isConnected?srcEl.getBoundingClientRect():null;
+  if(reduce.matches){finish();return;}
+  fadeChrome(false);
+  const v=visibleRect();
+  if(!t||t.bottom<0||t.top>innerHeight||!t.width){fly.animate([{opacity:1,transform:'none'},{opacity:0,transform:'scale(.96)'}],{duration:320,easing:'ease-in',fill:'forwards'}).onfinish=finish;return;}
+  // fit the current state into the card, keeping its proportions
+  const s=Math.min(t.width/v.width,t.height/v.height),tw=v.width*s,th=v.height*s;
+  const target={left:t.left+(t.width-tw)/2,top:t.top+(t.height-th)/2,width:tw,height:th};
+  const multi=v.width>t.width/t.height*v.height*1.2; // an open spread: let it dissolve into the cover as it lands
+  fly.animate([{transform:'none',opacity:1},{transform:flyTransform(v,target),opacity:multi?0:1}],{duration:FLY_MS-120,easing:SPRING,fill:'forwards'}).onfinish=finish;
+  if(multi&&srcEl){srcEl.style.visibility='';srcEl.animate([{opacity:0},{opacity:0,offset:.45},{opacity:1}],{duration:FLY_MS-120});}
 }
 
-// ── page turning ──
-// A leaf is built for a turn from pos to `to`; setAngle drives it, so drag and animation share one code path.
-function buildLeaf(dir,to){
-  const v=spread(pos),nv=spread(to);
-  const leaf=document.createElement('div');leaf.className='fb-leaf';
-  const face=(i,cls,sp)=>`<div class="fb-face ${cls}${sp}">${img(i)}<div class="fb-curl"></div></div>`;
-  let front,back,cast=document.createElement('div');cast.className='fb-cast';
-  if(two){
-    front=dir>0?v[1]:v[0];back=dir>0?nv[0]:nv[1];
-    leaf.style.left=dir>0?pw+'px':'0px';leaf.style.transformOrigin=dir>0?'left center':'right center';
-    leaf.innerHTML=face(front,'f',dir>0?' sp-r':' sp-l')+face(back,'b',dir>0?' sp-l':' sp-r');
-    book.innerHTML=dir>0?pg(v[0],'l')+pg(nv[1],'r'):pg(nv[0],'l')+pg(v[1],'r');
-    cast.style.left=dir>0?pw+'px':'0px';
-  }else{
-    leaf.style.left='0px';leaf.style.transformOrigin='left center';
-    const p=dir>0?v[0]:nv[0];leaf.innerHTML=face(p,'f','')+`<div class="fb-face b"><div class="fb-curl"></div></div>`;
-    book.innerHTML=pg(dir>0?nv[0]:v[0],'c');cast.style.left='0px';
-  }
-  // hide covered blank halves (cover spread / back cover)
-  book.appendChild(cast);book.appendChild(leaf);
-  return {leaf,cast,dir,to,
-    set(p){ // p: 0 → 1 progress of the turn
-      const s=two?dir:1;let deg=two?-180*p*dir:(dir>0?-180*p:-180*(1-p));
-      const lift=Math.sin(Math.PI*Math.min(1,Math.max(0,two?p:(dir>0?p:1-p))));
-      // slight curl: a touch of skew and scale toward the free edge while the page is in the air
-      leaf.style.transform=`rotateY(${deg}deg) skewY(${(two?-dir:-1)*lift*1.2}deg) scaleX(${1-lift*.02})`;
-      const curls=leaf.querySelectorAll('.fb-curl');
-      const shade=lift*.16,hl=lift*.22;
-      // front: darkens toward the spine as it lifts; back: highlight band along the fold
-      curls[0].style.background=`linear-gradient(${(two?dir:1)>0?'to left':'to right'},rgba(255,255,255,${hl*.6}) 0%,rgba(255,255,255,0) 30%,rgba(28,25,21,${shade}) 100%)`;
-      curls[1].style.background=`linear-gradient(${(two?dir:1)>0?'to right':'to left'},rgba(28,25,21,${shade*.9}) 0%,rgba(255,255,255,${hl*.5}) 60%,rgba(255,255,255,0) 100%)`;
-      // shadow the turning page casts on the page it reveals
-      cast.style.opacity=lift;cast.style.background=`linear-gradient(${(two?dir:1)>0?'to right':'to left'},rgba(28,25,21,${.22*lift}),rgba(28,25,21,0) ${20+60*(1-lift)}%)`;
-    }};
+// ── bending leaf ──
+const STRIPS=()=>innerWidth<760?12:18;
+function makeLeaf(frontI,backI,left){
+  const S=STRIPS(),w=pw/S,lf=document.createElement('div');lf.className='lf';lf.style.left=left+'px';
+  const bg=(i,x)=>i>=1&&i<=N?`background-image:url('${PS(i)}');background-size:${pw}px ${ph}px;background-position:${x}px 0`:'';
+  let parent=lf;const strips=[];
+  for(let i=0;i<S;i++){const s=document.createElement('div');s.className='s';s.style.cssText=`left:${i?w:0}px;width:${w+.6}px`;
+    s.innerHTML=`<b style="${bg(frontI,-i*w)}"><u></u></b><b class="k" style="${bg(backI,-(pw-(i+1)*w))}"><u></u></b>`;
+    parent.appendChild(s);parent=s;strips.push(s);}
+  // spine shading on the leaf itself, so it matches the pages around it
+  const sh=document.createElement('div');
+  strips[0].firstChild.classList.add('sp-r');strips[0].lastChild.classList.add('sp-l');
+  const us=strips.map(s=>s.querySelectorAll(':scope>b>u'));
+  return {el:lf,set(p,dir){ // p 0→1: the page lifts from the right and lays down on the left
+    const bend=Math.sin(Math.PI*p)*.42;let prev=0;
+    for(let i=0;i<S;i++){const x=(i+.5)/S;const phi=-180*Math.min(1,p+bend*(1-p)*Math.pow(x,1.7)*(p<.5?1:1-((p-.5)*1.2)));
+      strips[i].style.transform=`rotateY(${(phi-prev).toFixed(2)}deg)`;prev=phi;
+      const shade=Math.abs(Math.sin(phi*Math.PI/180));us[i][0].style.opacity=(shade*.14).toFixed(3);us[i][1].style.opacity=(shade*.11).toFixed(3);}
+  }};
 }
-function nextPos(dir){return dir>0?pos+(two?(pos===1?1:2):1):(two?(pos===2?1:pos-2):pos-1);}
-let turning=null;
-function animateLeaf(L,from,to,ms,fn){return new Promise(res=>{const t0=performance.now();
-  const tick=t=>{const k=Math.min(1,(t-t0)/ms),p=from+(to-from)*fn(k);L.set(p);if(k<1)requestAnimationFrame(tick);else res();};requestAnimationFrame(tick);});}
-async function turn(dir,ms=820){
-  if(turning||!open)return;if(dir>0&&atEnd())return;if(dir<0&&pos<=1)return;
-  const to=nextPos(dir);
-  if(reduce.matches){pos=to;draw();return;}
-  turning=buildLeaf(dir,to);turning.set(0);
-  await animateLeaf(turning,0,1,ms,ease);pos=to;turning=null;draw();
+// a turn always runs "forward" from spread a to spread b; going back just plays it in reverse
+function prepTurn(a,b){
+  const va=spread(a),vb=spread(b),cast=document.createElement('div');cast.className='fb-cast';
+  let leaf;
+  if(two){book.innerHTML=pgHTML(va[0],'l',[va[0],vb[1]])+pgHTML(vb[1],'r',[va[0],vb[1]]);
+    // the turning page keeps its spine shade only while a page sits opposite it
+    leaf=makeLeaf(va[1],vb[0],pw);cast.style.left=pw+'px';
+    if(va[0]<1)leaf.el.querySelector('.sp-r')?.classList.remove('sp-r');
+    if(vb[1]>N)leaf.el.querySelector('.sp-l')?.classList.remove('sp-l');
+    book.style.setProperty('--shift','0px');
+  }else{book.innerHTML=pgHTML(vb[0],'c',vb);leaf=makeLeaf(va[0],0,0);leaf.el.querySelectorAll('.sp-r,.sp-l').forEach(e=>e.classList.remove('sp-r','sp-l'));}
+  book.appendChild(cast);book.appendChild(leaf.el);
+  return p=>{leaf.set(p,1);const lift=Math.sin(Math.PI*p);
+    cast.style.opacity=lift.toFixed(3);cast.style.background=`linear-gradient(to right,rgba(28,25,21,${(.10*lift).toFixed(3)}),rgba(28,25,21,0) ${30+50*(1-p)}%)`;
+    if(!two)leaf.el.style.opacity=p<.55?1:Math.max(0,1-(p-.55)/.4);};
 }
-async function turnTo(target,ms){while(pos!==target&&pos>target){await turn(-1,ms);}}
+let turning=false;
+async function turn(dir,v0=0){
+  if(busy||turning||!isOpen)return;
+  if(mode==='sheet')return flipSheet(dir);
+  if(dir>0&&atEnd(pos))return;if(dir<0&&pos<=1)return;
+  const a=dir>0?pos:prevPos(pos),b=dir>0?nextPos(pos):pos;
+  if(reduce.matches){pos=dir>0?b:a;draw();return;}
+  turning=true;const set=prepTurn(a,b);
+  if(two)book.style.setProperty('--shift',shiftFor(dir>0?b:a)+'px');
+  set(dir>0?0:1);await spring(dir>0?0:1,dir>0?1:0,v0,p=>set(Math.max(0,Math.min(1,p))));
+  pos=dir>0?b:a;turning=false;draw();
+}
+// 1–2 page documents: the sheet turns over around its own centre, lifting a little as it goes
+async function flipSheet(dir,from,v0=0){
+  const sh=book.querySelector('.fb-sheet');const target=sheetA===0?180:0;
+  if(reduce.matches){sheetA=target;draw();return;}
+  turning=true;const start=from??sheetA;const us=sh.querySelectorAll('u');
+  await spring(start,target,v0,a=>{const t=Math.abs(Math.sin(a*Math.PI/180));
+    sh.style.transform=`translateZ(${(t*70).toFixed(1)}px) rotateY(${a.toFixed(2)}deg) rotateZ(${(t*-1.2).toFixed(2)}deg)`;
+    us[0].style.opacity=us[1].style.opacity=(t*.12).toFixed(3);},120,20);
+  sheetA=target;turning=false;
+}
 
-// drag: grab either half; the page follows the pointer, release completes or settles back
+// ── input: click a page, drag it, or use the arrow keys ──
 let drag=null;
-stage.addEventListener('pointerdown',e=>{if(!open||anim||turning||e.button>0)return;const r=book.getBoundingClientRect();
-  drag={x:e.clientX,y:e.clientY,t:performance.now(),dir:e.clientX>r.left+r.width/2?1:-1,L:null,p:0,w:two?r.width:r.width*1.1,id:e.pointerId};});
-stage.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;
-  if(!drag.L){if(Math.abs(dx)<8||Math.abs(dx)<Math.abs(dy))return;
-    const dir=dx<0?1:-1;if((dir>0&&atEnd())||(dir<0&&pos<=1)||reduce.matches){drag=null;return;}
-    drag.dir=dir;drag.L=buildLeaf(dir,nextPos(dir));turning=drag.L;stage.setPointerCapture(e.pointerId);stage.classList.add('dragging');}
-  drag.p=Math.max(0,Math.min(1,(-dx*drag.dir)/(drag.w*.9)));drag.L.set(drag.p);drag.v=dx/(performance.now()-drag.t);});
-const endDrag=async e=>{if(!drag)return;const d=drag;drag=null;stage.classList.remove('dragging');
-  if(!d.L){ // a click: turn by side
-    if(Math.abs(e.clientX-d.x)<8&&Math.abs(e.clientY-d.y)<8)turn(d.dir);return;}
-  const fast=Math.abs(d.v||0)>.5&&Math.sign(-(d.v||0))===d.dir;const done=d.p>.4||fast;
-  await animateLeaf(d.L,d.p,done?1:0,Math.max(220,560*(done?1-d.p:d.p)),easeOut);
-  if(done)pos=d.L.to;turning=null;draw();};
+stage.addEventListener('pointerdown',e=>{if(!isOpen||busy||turning||e.button>0)return;
+  const onDoc=!!e.target.closest('.fb-book');drag={x:e.clientX,y:e.clientY,t:performance.now(),onDoc,set:null,id:e.pointerId,p:0,v:0};});
+stage.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id||!drag.onDoc)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;
+  if(!drag.set){if(Math.abs(dx)<8||Math.abs(dx)<Math.abs(dy))return;const dir=dx<0?1:-1;
+    if(mode==='sheet'){drag.sheet=true;drag.dir=dir;}
+    else{if((dir>0&&atEnd(pos))||(dir<0&&pos<=1)||reduce.matches){drag=null;return;}
+      drag.dir=dir;drag.a=dir>0?pos:prevPos(pos);drag.b=dir>0?nextPos(pos):pos;turning=true;drag.set=prepTurn(drag.a,drag.b);
+      if(two)book.style.setProperty('--shift',shiftFor(dir>0?drag.b:drag.a)+'px');}
+    drag.set=drag.set||(()=>{});stage.setPointerCapture(e.pointerId);}
+  const w=(two?pw*2:pw)*.85,now=performance.now();
+  if(drag.sheet){const k=Math.max(0,Math.min(1,Math.abs(dx)/(pw*.9)));drag.p=k;const a=sheetA+(sheetA===0?180:-180)*k;
+    const sh=book.querySelector('.fb-sheet');sh.style.transform=`translateZ(${Math.abs(Math.sin(a*Math.PI/180))*70}px) rotateY(${a}deg)`;drag.ang=a;}
+  else{const p=drag.dir>0?Math.max(0,Math.min(1,-dx/w)):Math.max(0,Math.min(1,1-dx/w));drag.v=(p-drag.p)/Math.max(1,now-drag.t)*1000;drag.p=p;drag.set(p);}
+  drag.t=now;});
+const endDrag=async e=>{if(!drag||e.pointerId!==drag.id)return;const d=drag;drag=null;
+  if(!d.set){if(Math.abs(e.clientX-d.x)<8&&Math.abs(e.clientY-d.y)<8){
+      if(!d.onDoc){closeReader();return;}
+      const r=book.querySelector('.fb-pg,.fb-sheet')?visibleRect():book.getBoundingClientRect();
+      if(mode==='sheet'||pos===1)turn(1);else turn(e.clientX<r.left+r.width/2?-1:1);}return;}
+  if(d.sheet){turning=true;await flipSheet(0,d.ang);return;}
+  const goingFwd=d.dir>0,p=d.p,v=d.v;let target;
+  if(Math.abs(v)>1.2)target=v<0?0:1;else target=p>.5?1:0;
+  // a drag "forward" completes at 1, a drag "back" completes at 0
+  await spring(p,target,v,x=>d.set(Math.max(0,Math.min(1,x))));
+  pos=target===1?d.b:d.a;turning=false;draw();};
 stage.addEventListener('pointerup',endDrag);stage.addEventListener('pointercancel',endDrag);
-// clicking the empty paper around the book closes the reader
-R.querySelector('.rd-bg').addEventListener('click',closeReader);
-stage.addEventListener('click',e=>{if(e.target===stage&&!turning)closeReader();});
-document.getElementById('rdClose').onclick=closeReader;
-document.addEventListener('keydown',e=>{if(!open)return;
+R.querySelector('.rd-close').onclick=closeReader;
+document.addEventListener('keydown',e=>{if(!isOpen)return;
   if(e.key==='Escape'){e.preventDefault();closeReader();}
   if(e.key==='ArrowRight'){e.preventDefault();turn(1);}
   if(e.key==='ArrowLeft'){e.preventDefault();turn(-1);}
-  if(e.key==='Tab'){e.preventDefault();document.getElementById('rdClose').focus();}});
-addEventListener('resize',()=>{if(open&&!turning)layout();});
+  if(e.key==='Tab'){e.preventDefault();R.querySelector('.rd-close').focus();}});
+addEventListener('resize',()=>{if(isOpen&&!turning)layout();});
 
 Promise.all([fetch('/data/documents.json').then(r=>r.json()),fetch('/flip/manifest.json').then(r=>r.ok?r.json():{}).catch(()=>({}))]).then(([d,f])=>{
   DOCS=d;FLIP=f;
