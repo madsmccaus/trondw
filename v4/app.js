@@ -74,27 +74,47 @@ const named=[];
 function name(el,n){if(el){el.style.viewTransitionName=n;named.push(el);}}
 function unname(){named.splice(0).forEach(el=>el.style.viewTransitionName='');}
 const byKey=k=>k?root.querySelector(`[data-k="${CSS.escape(k)}"]`):null;
+const morphProps=['--vt-title-ms','--vt-root-in-delay','--vt-root-in-ms'];
+function setMorphTiming(el){
+  const dist=Math.max(0,el.getBoundingClientRect().top-170);
+  const ms=Math.min(320,Math.round(220+dist*0.11));
+  const rootDelay=Math.round(ms*0.76);
+  document.documentElement.style.setProperty('--vt-title-ms',ms+'ms');
+  document.documentElement.style.setProperty('--vt-root-in-delay',rootDelay+'ms');
+  document.documentElement.style.setProperty('--vt-root-in-ms','150ms');
+}
+function clearMorphTiming(){morphProps.forEach(p=>document.documentElement.style.removeProperty(p));}
 let busy=null;
 async function go(url,{push=true,k=null}={}){
   const u=new URL(url,location.href);
+  const st0=history.state||{};
+  const postKey=k||st0.k;
+  const morphEl=postKey?byKey(postKey):null;
+  const morph=!!morphEl;
+  const toPost=!!(u.searchParams.get('m')&&u.searchParams.get('i'));
   const v=await view(u,push?location.pathname+location.search:undefined); // load first; nothing moves until the next view is ready
-  const apply=()=>{paint(v,{focus:true});const hd=document.querySelector('.site-head'),hn=hd.style.viewTransitionName;
+  const apply=()=>{
     const st=history.state||{};
-    if(u.hash&&push){const t=document.getElementById(u.hash.slice(1));if(t){t.scrollIntoView();return;}}
-    scrollTo(0,push?0:(st.y||0));
-    unname();if(hn)name(hd,hn);name(byKey(k||st.k),'post-title');};
-  if(push){history.replaceState({...(history.state||{}),y:scrollY,k},'');
+    if(u.hash&&push){const t=document.getElementById(u.hash.slice(1));if(t){paint(v);t.scrollIntoView();return;}}
+    if(toPost)scrollTo(0,0);
+    else if(!push)scrollTo(0,st.y||0);
+    paint(v,{focus:false});
+    if(toPost)scrollTo(0,0);
+    const hd=document.querySelector('.site-head'),hn=hd.style.viewTransitionName;
+    unname();if(hn)name(hd,hn);name(byKey(postKey),'post-title');};
+  if(push){history.replaceState({...(history.state||{}),y:scrollY,k:postKey||st0.k},'');
     const from=location.pathname+location.search;
-    history.pushState({y:0,from:u.searchParams.get('m')?from:'',k},'',u);}
-  if(!document.startViewTransition||reduce.matches){apply();return;}
+    history.pushState({y:0,from:u.searchParams.get('m')?from:'',k:postKey||''},'',u);}
+  if(!document.startViewTransition||reduce.matches){apply();if(toPost||morph)focusView();return;}
   if(busy)busy.skipTransition();
-  unname();name(byKey(k),'post-title');
+  unname();if(morphEl)name(morphEl,'post-title');
   // the header only stays fixed when it is on screen on both sides; otherwise it simply fades with the page
   const head=document.querySelector('.site-head'),toY=push?0:((history.state&&history.state.y)||0);
   if(scrollY>2||toY>2)name(head,'none');
-  const morph=!!byKey(k);document.documentElement.classList.toggle('vt-morph',morph);
+  if(morph)setMorphTiming(morphEl);
+  document.documentElement.classList.toggle('vt-morph',morph);
   busy=document.startViewTransition(apply);
-  busy.finished.finally(()=>{unname();document.documentElement.classList.remove('vt-morph');busy=null;});
+  busy.finished.finally(()=>{unname();document.documentElement.classList.remove('vt-morph');clearMorphTiming();busy=null;focusView();});
 }
 if('scrollRestoration' in history)history.scrollRestoration='manual';
 document.addEventListener('click',e=>{const a=e.target.closest('a[href]');

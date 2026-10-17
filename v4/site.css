@@ -54,12 +54,15 @@ footer.site p{margin:0}
   ::view-transition-old(site-head){animation:none;opacity:0}
   ::view-transition-new(site-head){animation:none}
   /* shared title: no old/new cross-fade — only ::view-transition-group moves and scales */
-  ::view-transition-group(post-title){animation-duration:.22s;animation-timing-function:var(--vt-ease);overflow:visible}
+  ::view-transition-group(post-title){animation-duration:.22s;animation-timing-function:var(--vt-ease);overflow:visible;z-index:2}
   ::view-transition-old(post-title){animation:none!important;opacity:0!important}
   ::view-transition-new(post-title){animation:none!important;opacity:1!important}
   ::view-transition-image-pair(post-title){height:100%;width:100%}
-  /* morph: fast out, body in overlaps the last 40% of the title move (~300ms total) */
+  ::view-transition-group(root){z-index:1}
+  /* morph: old page out fast; new page hidden until title is ~76% done, then 150ms in (vars from app.js) */
+  html.vt-morph{--vt-title-ms:220ms;--vt-root-in-delay:168ms;--vt-root-in-ms:150ms}
+  html.vt-morph ::view-transition-group(post-title){animation-duration:var(--vt-title-ms)}
   html.vt-morph ::view-transition-old(root){animation:vt-out .12s ease-out both}
-  html.vt-morph ::view-transition-new(root){animation:vt-in .18s var(--vt-ease) .132s both}
+  html.vt-morph ::view-transition-new(root){animation:vt-in var(--vt-root-in-ms) var(--vt-ease) var(--vt-root-in-delay) both}
 }
 @media(max-width:760px){.site-head{padding:2rem 1.15rem 0}.site-nav{gap:1.1rem}}

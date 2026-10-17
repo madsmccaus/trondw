@@ -100,10 +100,10 @@ html.rd-lock{overflow:hidden}
 .fb-sheet>div img{display:block;width:100%;height:100%;object-fit:contain;-webkit-user-drag:none}
 .fb-sheet>div.k{transform:rotateY(180deg)}
 .fb-sheet>div>u{position:absolute;inset:0;background:rgb(var(--shc));opacity:0;pointer-events:none}
-.rd-meta{position:absolute;left:50%;z-index:-1;width:min(36rem,calc(100vw - 2rem));text-align:center;opacity:0;transform:translateX(-50%);pointer-events:none}
+.rd-meta{position:absolute;left:0;z-index:-1;display:flex;flex-direction:column;align-items:center;width:min(36rem,calc(100vw - 2rem));max-width:calc(100vw - 2rem);text-align:center;opacity:0;transform:translateX(-50%);pointer-events:none}
 .fb-pg,.fb-sheet,.fb-stack{z-index:1}
-.rd-meta .date{font-family:var(--sans);font-size:.85rem;font-weight:500;color:var(--mute);margin:0 0 .3rem}
-.rd-meta .t{font-size:1.25rem;font-weight:500;line-height:1.25;text-wrap:balance;margin:0}
+.rd-meta .date{font-family:var(--sans);font-size:.85rem;font-weight:500;color:var(--mute);margin:0 0 .3rem;width:100%;text-align:center}
+.rd-meta .t{font-size:1.25rem;font-weight:500;line-height:1.25;text-wrap:balance;margin:0;width:100%;text-align:center}
 .rd-meta a{display:inline-block;margin-top:.5rem;font-family:var(--sans);font-size:.85rem;color:var(--accent);border-bottom:1px solid currentColor;pointer-events:auto}
 .rd-meta[data-under]{visibility:hidden}
 @media (prefers-reduced-motion:reduce){.fb-book{transition:none}.thumb,.feature .cover,.feature .cover img{transition:none}.grid button:hover .thumb,.grid button:focus-visible .thumb,.feature .cover:hover,.feature .cover:focus-visible{transform:none}.grid li.in-more{animation:none}.years button:active,.btn:active{transform:none}}
@@ -256,11 +256,26 @@ function syncMetaUnderLeaf(){
   else if(S)under=Math.abs(S.a-S.target)>5;
   if(under)meta.setAttribute('data-under','');else meta.removeAttribute('data-under');
 }
+function positionMeta(){
+  if(!book||meta.parentElement!==book||!pw)return;
+  let cx=pw/2,pagesWide=1;
+  if(two){
+    const v=spread(pos),hasL=ex(v[0]),hasR=ex(v[1]);
+    if(hasL&&hasR){cx=pw;pagesWide=2;}
+    else if(hasR){cx=pw*1.5;pagesWide=1;}
+    else if(hasL){cx=pw*0.5;pagesWide=1;}
+    else cx=pw;
+  }
+  meta.style.left=cx+'px';
+  meta.style.transform='translateX(-50%)';
+  meta.style.maxWidth=Math.min(36*parseFloat(getComputedStyle(document.documentElement).fontSize||'18'),pagesWide*pw,innerWidth-32)+'px';
+}
 function draw(){
-  if(mode==='sheet'){setBookHTML(`<div class="fb-sheet" style="transform:rotateY(${sheetA}deg)"><div class="f">${im(1)}<u></u></div><div class="k">${N>1?im(2):''}<u></u></div></div>`);return;}
+  if(mode==='sheet'){setBookHTML(`<div class="fb-sheet" style="transform:rotateY(${sheetA}deg)"><div class="f">${im(1)}<u></u></div><div class="k">${N>1?im(2):''}<u></u></div></div>`);positionMeta();return;}
   const v=spread(pos);setBookHTML(stackHTML()+(two?pgHTML(v[0],'l',ex(v[1]))+pgHTML(v[1],'r',ex(v[0])):pgHTML(v[0],'c')));
   book.style.setProperty('--shift',shiftFor(pos)+'px');
   [pos+1,pos+2,pos+3].forEach(i=>{if(i<=N)new Image().src=PS(i);});
+  positionMeta();
 }
 function layout(){
   const r=stage.getBoundingClientRect(),narrow=r.width<760,metaH=narrow?84:96,top=narrow?60:64,padX=narrow?20:64;
@@ -271,7 +286,7 @@ function layout(){
   book.style.left=(r.width-cols*pw)/2+'px';book.style.top=bt+'px';
   meta.style.top=(ph+(narrow?16:22))+'px';
   if(two&&pos>1&&pos%2===1)pos--;
-  book.style.transition='none';draw();void book.offsetWidth;book.style.transition='';
+  book.style.transition='none';draw();void book.offsetWidth;book.style.transition='';positionMeta();
 }
 function visibleRect(){const els=[...book.querySelectorAll('.fb-pg,.fb-sheet')];const rs=els.map(e=>e.getBoundingClientRect());
   if(!rs.length)return book.getBoundingClientRect();
