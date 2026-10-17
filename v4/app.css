@@ -23,15 +23,23 @@ main{padding-top:1.5rem;min-height:60vh}
 .article .body p{margin:0 0 1.1em;text-wrap:pretty}
 .empty{padding:3rem 0;font-family:var(--sans);color:var(--mute)}
 /* Arkiv: one year at a time, months inside it */
-.ark-years,.ark-months{display:flex;flex-wrap:wrap;justify-content:center;gap:.25rem;font-family:var(--sans);font-size:.9rem;font-weight:500;margin:0}
+.ark-years{display:flex;flex-wrap:wrap;justify-content:center;gap:.25rem;font-family:var(--sans);font-size:.9rem;font-weight:500;margin:0}
+.ark-months{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:.12rem;max-width:42rem;margin:.75rem auto 0;font-family:var(--sans);font-size:clamp(.62rem,1.05vw,.82rem);font-weight:500;text-align:center}
 .ark-years a,.ark-months a{position:relative;border-radius:6px;padding:.4rem .65rem}
+.ark-months a{padding:.35rem .2rem}
+.mo-empty{display:block;padding:.35rem .15rem;color:var(--mute);opacity:.38;user-select:none}
 .ark-years a::before,.ark-months a::before{content:"";position:absolute;inset:-.35rem -.15rem}
 @media (hover:none),(pointer:coarse){.ark-years a::before,.ark-months a::before{inset:-.45rem -.15rem}}
 @media (hover:hover) and (pointer:fine){.ark-years a:hover,.ark-months a:hover{background:var(--hover)}}
 .ark-years a[aria-current="page"]{background:var(--ink);color:var(--paper)}
 .ark-years a:active,.ark-months a:active{transform:scale(.97);transition:transform 150ms ease-out}
-.ark-months{margin-top:.75rem;color:var(--mute)}
+.ark-months{color:var(--mute)}
 @media (hover:hover) and (pointer:fine){.ark-months a:hover{color:var(--ink)}}
+.morph-blank{visibility:hidden}
+html.morph-stage .site-head,html.morph-stage footer.site{visibility:visible}
+.title-morph-ghost{position:fixed;z-index:50;margin:0;pointer-events:none;text-wrap:balance}
+.article.morph-wait .date,.article.morph-wait .body,.article.morph-wait ~ .back-tail,.morph-stage .back{opacity:0}
+.article.morph-wait h1{opacity:0}
 .ark-count{text-align:center;font-family:var(--sans);font-size:.9rem;color:var(--mute);margin:1.25rem 0 3.5rem;font-variant-numeric:tabular-nums}
 .month{scroll-margin-top:1.5rem;margin:0 0 4rem;content-visibility:auto;contain-intrinsic-size:auto 2000px}
 .month h2{font-size:1.8rem;font-weight:500;line-height:1.2;margin:0 0 1.5rem}
@@ -46,6 +54,7 @@ main{padding-top:1.5rem;min-height:60vh}
 .to-top.on:active{transition:transform 150ms ease-out,opacity 200ms cubic-bezier(.32,.72,0,1),visibility 0s}
 @media (hover:hover) and (pointer:fine){.to-top:hover{color:var(--ink)}}
 @media(max-width:600px){
+  .ark-months{font-size:.58rem;gap:.06rem}
   .page{padding:0 1.15rem}
   .entry{padding:2rem 0}
   .title{font-size:1.5rem;max-width:none}

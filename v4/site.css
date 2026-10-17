@@ -42,27 +42,27 @@ a{color:inherit;text-decoration:none}
 .theme:focus-visible{outline:none}.theme:focus-visible .track{outline:2px solid var(--ink);outline-offset:2px}
 footer.site{display:flex;flex-direction:column;align-items:center;gap:1.1rem;padding:5rem 0 3rem;font-family:var(--sans);font-size:.85rem;color:var(--mute)}
 footer.site p{margin:0}
-/* page-to-page: header stays put; post title morphs as one element (group transform only) */
+/* page-to-page: header and archive chrome stay fixed; content cross-fades quietly */
 @keyframes vt-out{to{opacity:0}}
 @keyframes vt-in{from{opacity:0}}
 @media (prefers-reduced-motion:no-preference){
   @view-transition{navigation:auto}
-  --vt-ease:cubic-bezier(.32,.72,0,1);
-  ::view-transition-old(root){animation:vt-out .12s ease-in both}
-  ::view-transition-new(root){animation:vt-in .18s var(--vt-ease) .04s both}
-  ::view-transition-group(site-head){animation:none}
-  ::view-transition-old(site-head){animation:none;opacity:0}
-  ::view-transition-new(site-head){animation:none}
-  /* shared title: no old/new cross-fade — only ::view-transition-group moves and scales */
-  ::view-transition-group(post-title){animation-duration:.22s;animation-timing-function:var(--vt-ease);overflow:visible;z-index:2}
-  ::view-transition-old(post-title){animation:none!important;opacity:0!important}
-  ::view-transition-new(post-title){animation:none!important;opacity:1!important}
-  ::view-transition-image-pair(post-title){height:100%;width:100%}
-  ::view-transition-group(root){z-index:1}
-  /* morph: old page out fast; new page hidden until title is ~76% done, then 150ms in (vars from app.js) */
-  html.vt-morph{--vt-title-ms:220ms;--vt-root-in-delay:168ms;--vt-root-in-ms:150ms}
-  html.vt-morph ::view-transition-group(post-title){animation-duration:var(--vt-title-ms)}
-  html.vt-morph ::view-transition-old(root){animation:vt-out .12s ease-out both}
-  html.vt-morph ::view-transition-new(root){animation:vt-in var(--vt-root-in-ms) var(--vt-ease) var(--vt-root-in-delay) both}
+  ::view-transition-group(site-head),
+  ::view-transition-group(ark-years),
+  ::view-transition-group(ark-months),
+  ::view-transition-group(ark-title){animation:none}
+  ::view-transition-old(site-head),
+  ::view-transition-new(site-head),
+  ::view-transition-old(ark-years),
+  ::view-transition-new(ark-years),
+  ::view-transition-old(ark-months),
+  ::view-transition-new(ark-months),
+  ::view-transition-old(ark-title),
+  ::view-transition-new(ark-title){animation:none}
+  html.vt-quiet ::view-transition-old(root){animation:vt-out .15s ease both}
+  html.vt-quiet ::view-transition-new(root){animation:vt-in .15s ease both}
+  html.vt-quiet ::view-transition-old(ark-content){animation:vt-out .15s ease both}
+  html.vt-quiet ::view-transition-new(ark-content){animation:vt-in .15s ease both}
+  html.vt-quiet ::view-transition-group(ark-content){animation-duration:.15s}
 }
 @media(max-width:760px){.site-head{padding:2rem 1.15rem 0}.site-nav{gap:1.1rem}}
