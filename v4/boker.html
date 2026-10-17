@@ -105,6 +105,7 @@ html.rd-lock{overflow:hidden}
 .rd-meta .date{font-family:var(--sans);font-size:.85rem;font-weight:500;color:var(--mute);margin:0 0 .3rem}
 .rd-meta .t{font-size:1.25rem;font-weight:500;line-height:1.25;text-wrap:balance;margin:0}
 .rd-meta a{display:inline-block;margin-top:.5rem;font-family:var(--sans);font-size:.85rem;color:var(--accent);border-bottom:1px solid currentColor;pointer-events:auto}
+.rd-meta[data-under]{visibility:hidden}
 @media (prefers-reduced-motion:reduce){.fb-book{transition:none}.thumb,.feature .cover,.feature .cover img{transition:none}.grid button:hover .thumb,.grid button:focus-visible .thumb,.feature .cover:hover,.feature .cover:focus-visible{transform:none}.grid li.in-more{animation:none}.years button:active,.btn:active{transform:none}}
 @media(max-width:760px){
   .page{padding:0 1.15rem}
@@ -245,8 +246,16 @@ const ex=i=>i>=1&&i<=N;
 function pgHTML(i,side,shade){if(!ex(i))return '';const sp=two&&shade?(side==='l'?' sp-l':' sp-r'):'';return `<div class="fb-pg ${two?side:'c'}${sp}" data-p="${i}">${im(i)}</div>`;}
 function stackHTML(){return N>=3?`<div class="fb-stack" style="${two?'right:0':'left:0'};opacity:${pos===1?1:0}"><i></i><i></i></div>`:'';}
 function parkMeta(){if(meta.parentElement===book)book.removeChild(meta);}
-function placeMeta(){if(phase!=='closed'&&book)book.appendChild(meta);}
+function placeMeta(){if(phase!=='closed'&&book)book.insertBefore(meta,book.firstChild);}
 function setBookHTML(html){parkMeta();book.innerHTML=html;placeMeta();}
+function syncMetaUnderLeaf(){
+  if(phase!=='open'||getComputedStyle(meta).opacity==='0'){meta.removeAttribute('data-under');return;}
+  let under=false;
+  if(T)under=T.p>0.06&&T.p<0.96;
+  else if(drag&&drag.live)under=drag.p>0.06&&drag.p<0.96;
+  else if(S)under=Math.abs(S.a-S.target)>5;
+  if(under)meta.setAttribute('data-under','');else meta.removeAttribute('data-under');
+}
 function draw(){
   if(mode==='sheet'){setBookHTML(`<div class="fb-sheet" style="transform:rotateY(${sheetA}deg)"><div class="f">${im(1)}<u></u></div><div class="k">${N>1?im(2):''}<u></u></div></div>`);return;}
   const v=spread(pos);setBookHTML(stackHTML()+(two?pgHTML(v[0],'l',ex(v[1]))+pgHTML(v[1],'r',ex(v[0])):pgHTML(v[0],'c')));
@@ -355,7 +364,7 @@ function finishNow(){if(srcEl)srcEl.style.visibility='';teardown();}
 // ── bending leaf ──
 const STRIPS=()=>innerWidth<760?16:24;
 function makeLeaf(frontI,backI,left,shF,shB){
-  const S=STRIPS(),w=pw/S,lf=document.createElement('div');lf.className='lf';lf.style.left=left+'px';
+  const S=STRIPS(),w=pw/S,lf=document.createElement('div');lf.className='lf';lf.style.left=left+'px';lf.style.transform='translateZ(48px)';
   const bg=(i,x)=>i>=1&&i<=N?`background-image:url('${PS(i)}');background-size:${pw}px ${ph}px;background-position:${x}px 0`:'';
   let parent=lf;const strips=[];
   for(let i=0;i<S;i++){const s=document.createElement('div');s.className='s';s.style.cssText=`left:${i?w:0}px;width:${w+.6}px`;
@@ -413,6 +422,7 @@ function step(dt){
     S.sh.style.transform=`translateZ(${(t*70).toFixed(1)}px) rotateY(${S.a.toFixed(2)}deg) rotateZ(${(t*-1.2).toFixed(2)}deg)`;
     S.us.forEach(u=>u.style.opacity=(t*.12).toFixed(3));
     if(Math.abs(S.a-S.target)<.2&&Math.abs(S.v)<.5){sheetA=S.target;S.sh.style.transform=`rotateY(${sheetA}deg)`;S=null;}}
+  syncMetaUnderLeaf();
 }
 // a request during a turn: same direction queues the next page, the other direction reverses at once
 function request(dir){
@@ -446,7 +456,7 @@ stage.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id||phase!
     book.querySelector('.fb-sheet').style.transform=`translateZ(${Math.abs(Math.sin(drag.ang*Math.PI/180))*70}px) rotateY(${drag.ang}deg)`;}
   else{const p=drag.dir>0?Math.max(0,Math.min(1,-dx/w)):Math.max(0,Math.min(1,1-dx/w));drag.v=(p-drag.p)/Math.max(1,now-drag.t)*1000;drag.p=p;
     if(Math.abs(drag.v)>.15)drag.cd+=((drag.v>0?1:-1)-drag.cd)*.35; // the curl follows the hand
-    drag.set(p,drag.cd);}
+    drag.set(p,drag.cd);syncMetaUnderLeaf();}
   drag.t=now;});
 const endDrag=e=>{if(!drag||e.pointerId!==drag.id)return;const d=drag;drag=null;
   if(!d.live){ // a tap: act immediately
@@ -454,7 +464,7 @@ const endDrag=e=>{if(!drag||e.pointerId!==drag.id)return;const d=drag;drag=null;
     const r=visibleRect();request(e.clientX<r.left+r.width/2?-1:1);return;}
   if(d.sheet){sheetA=d.a0;const sh=book.querySelector('.fb-sheet');S={a:d.ang,v:0,target:Math.abs(d.ang-d.a0)>60?(d.a0===0?180:0):d.a0,sh,us:sh.querySelectorAll('u')};tickStart();return;}
   const target=Math.abs(d.v)>1.2?(d.v<0?0:1):(d.p>.5?1:0);
-  T={a:d.a,b:d.b,set:d.set,p:d.p,v:d.v,target,queue:0,cd:d.cd};tickStart();};
+  T={a:d.a,b:d.b,set:d.set,p:d.p,v:d.v,target,queue:0,cd:d.cd};tickStart();syncMetaUnderLeaf();};
 stage.addEventListener('pointerup',endDrag);stage.addEventListener('pointercancel',endDrag);
 R.querySelector('.rd-close').addEventListener('pointerdown',e=>{e.preventDefault();closeReader();});
 R.querySelector('.rd-close').onclick=closeReader;
