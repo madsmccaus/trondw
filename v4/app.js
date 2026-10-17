@@ -5,7 +5,8 @@ const root=document.getElementById('root');
 const reduce=matchMedia('(prefers-reduced-motion: reduce)');
 const MNF=TW.MNF,cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
 const fmt=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g,'\u00a0');
-let ALL=null;const monthFiles={},yearFiles={};let YEARS=null;
+let ALL=null,META=null;const monthFiles={},yearFiles={};let YEARS=null;
+const getMeta=async()=>{if(!META)META=await getJSON('/data/meta.json');return META||{};};
 const posts=async()=>{if(!ALL)ALL=(await TW.latest()).map(TW.clean).filter(p=>p.x);return ALL;};
 const getJSON=u=>fetch(u).then(r=>r.ok?r.json():null).catch(()=>null);
 async function find(m,i){const all=await posts();const p=all.find(x=>x.m===m&&String(x.i)===i);if(p)return p;
@@ -17,7 +18,9 @@ const postHref=(m,i)=>`/v4?m=${encodeURIComponent(m)}&i=${encodeURIComponent(i)}
 const tag=p=>p.sample?' · <span class="sample">Eksempel</span>':'';
 
 // ── views ──
-function homeHTML(all){return (all.length?all.map(p=>`
+function homeHTML(all,meta){const n=meta.total_posts!=null?fmt(meta.total_posts):'';
+  const dr=meta.date_range;const range=dr&&dr[0]&&dr[1]?`${dr[0].slice(0,4)}–${dr[1].slice(0,4)}`:'2016–2022';
+  return (all.length?all.map(p=>`
     <article class="entry">
       <p class="date">${TW.date(p.d)}${tag(p)}</p>
       <h2 class="title"><a href="${postHref(p.m,p.i)}" data-k="${TW.esc(key(p.m,p.i))}">${TW.esc(p.t)}</a></h2>
@@ -26,7 +29,7 @@ function homeHTML(all){return (all.length?all.map(p=>`
     </article>`).join(''):'<p class="empty">Ingen nye innlegg ennå.</p>')+`
     <section class="archive">
       <a href="/v4/arkiv">Gå til arkivet →</a>
-      <p>4 415 innlegg fra 2016–2022.</p>
+      <p>${n?`${n} innlegg fra ${range}.`:`Innlegg fra ${range}.`}</p>
     </section>`;}
 function archiveHTML(y,rows){
   const months=[];rows.forEach(r=>{const mo=r[1].slice(5,7);let g=months[months.length-1];if(!g||g.mo!==mo){g={mo,rows:[]};months.push(g);}g.rows.push(r);});
@@ -44,7 +47,7 @@ function postHTML(p,from){const back=from&&from.startsWith('/v4/arkiv')
       <h1 data-k="${TW.esc(key(p.m,p.i))}">${TW.esc(p.t)}</h1>
       <div class="body">${TW.paras(p.x)}</div>
     </article>
-    <p style="margin:2.5rem 0 4rem">${back}</p>`;}
+    <p class="back-tail">${back}</p>`;}
 // returns a paint function, so all data is loaded before the old view leaves
 async function view(u,from){
   const q=u.searchParams;
@@ -57,11 +60,14 @@ async function view(u,from){
   if(m&&i){const p=await find(m,i);
     if(!p)return {title:'Trond Worren',nav:'',html:'<p class="empty">Fant ikke innlegget.</p>'};
     return {title:`${p.t} · Trond Worren`,nav:'',html:postHTML(p,from!==undefined?from:((history.state&&history.state.from)||''))};}
-  return {title:'Trond Worren',nav:'/v4',html:homeHTML(await posts())};
+  return {title:'Trond Worren',nav:'/v4',html:homeHTML(await posts(),await getMeta())};
 }
-function paint(v){document.title=v.title;root.innerHTML=v.html;
+function focusView(){const h=root.querySelector('h1:not(.sr)');
+  if(h){if(!h.hasAttribute('tabindex'))h.setAttribute('tabindex','-1');h.focus({preventScroll:true});return;}
+  if(!root.hasAttribute('tabindex'))root.setAttribute('tabindex','-1');root.focus({preventScroll:true});}
+function paint(v,{focus=false}={}){document.title=v.title;root.innerHTML=v.html;
   document.querySelectorAll('.site-nav a').forEach(a=>{if(a.getAttribute('href')===v.nav)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
-  topBtn();}
+  topBtn();if(focus)focusView();}
 
 // ── navigation ──
 const named=[];
@@ -72,7 +78,7 @@ let busy=null;
 async function go(url,{push=true,k=null}={}){
   const u=new URL(url,location.href);
   const v=await view(u,push?location.pathname+location.search:undefined); // load first; nothing moves until the next view is ready
-  const apply=()=>{paint(v);const hd=document.querySelector('.site-head'),hn=hd.style.viewTransitionName;
+  const apply=()=>{paint(v,{focus:true});const hd=document.querySelector('.site-head'),hn=hd.style.viewTransitionName;
     const st=history.state||{};
     if(u.hash&&push){const t=document.getElementById(u.hash.slice(1));if(t){t.scrollIntoView();return;}}
     scrollTo(0,push?0:(st.y||0));

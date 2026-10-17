@@ -6,6 +6,7 @@
 <title>Om · Trond Worren</title>
 <script src="/v4/theme.js"></script>
 <link rel="preload" href="/fonts/EBGaramond-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/EBGaramond-Italic-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/v4/site.css">
 <script type="speculationrules">{"prefetch":[{"source":"document","where":{"href_matches":"/v4*"},"eagerness":"moderate"}]}</script>
 <style>
@@ -18,7 +19,7 @@ blockquote{margin:0 0 2rem;padding:0}
 blockquote p{font-size:1.35rem;line-height:1.55;font-style:italic}
 blockquote footer{font-family:var(--sans);font-size:.9rem;color:var(--mute)}
 a.u{border-bottom:1px solid currentColor}
-a.u:hover{color:var(--accent)}
+@media (hover:hover) and (pointer:fine){a.u:hover{color:var(--accent)}}
 ul{list-style:none;margin:0;padding:0}
 .list li{display:flex;justify-content:space-between;gap:1.5rem;align-items:baseline;padding:.55rem 0;font-size:1.15rem}
 .list .y,.media .y{font-family:var(--sans);font-size:.9rem;color:var(--mute);font-variant-numeric:tabular-nums;white-space:nowrap}
