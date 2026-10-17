@@ -56,16 +56,16 @@
 @keyframes rise-more{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .grid li.in-more{animation:rise-more .2s cubic-bezier(.32,.72,0,1) both;animation-delay:calc(var(--i,0) * 30ms)}
 /* reader: the document itself travels from its card to the centre of the screen */
-.rd{position:fixed;inset:0;z-index:50;visibility:hidden}
+.rd{position:fixed;inset:0;z-index:50;visibility:hidden;isolation:isolate}
 .rd.on{visibility:visible}
 html{scrollbar-gutter:stable}
 html.rd-lock{overflow:hidden}
 .rd-bg,.rd-meta,.rd-close{opacity:0}
-.rd-bg{position:absolute;inset:0;background:var(--paper);opacity:0}
+.rd-bg{position:absolute;inset:0;z-index:0;background:var(--paper);opacity:0}
 .rd-close{position:absolute;top:1rem;right:1.25rem;z-index:5;opacity:0}
-.fb-stage{position:absolute;inset:0;perspective:3400px;user-select:none;-webkit-user-select:none;touch-action:pan-y}
-.fb-fly{position:absolute;inset:0;z-index:2;transform-style:preserve-3d;pointer-events:none}
-.fb-book{position:absolute;width:calc(var(--pw) * var(--cols));height:var(--ph);transform-style:preserve-3d;pointer-events:auto;cursor:pointer;transform:translateX(var(--shift,0px));transition:transform .75s var(--spring)}
+.fb-stage{position:absolute;inset:0;z-index:2;perspective:3400px;user-select:none;-webkit-user-select:none;touch-action:pan-y}
+.fb-fly{position:absolute;inset:0;transform-style:preserve-3d;pointer-events:none}
+.fb-book{position:absolute;width:calc(var(--pw) * var(--cols));height:var(--ph);transform-style:preserve-3d;pointer-events:auto;cursor:pointer;transform:translate3d(var(--shift,0px),0,0);transition:transform .75s var(--spring)}
 .fb-pg,.fb-sheet,.fb-stack i{position:absolute;top:0;width:var(--pw);height:var(--ph);background:var(--sheet)}
 .fb-pg{overflow:hidden;box-shadow:var(--paper-shadow)}
 .fb-pg.l{left:0}.fb-pg.r{right:0}.fb-pg.c{left:0}
@@ -88,22 +88,23 @@ html.rd-lock{overflow:hidden}
 .sp-l::after{right:0;background:linear-gradient(to left,rgba(var(--shc),.08),rgba(var(--shc),.025) 40%,transparent)}
 .sp-r::after{left:0;background:linear-gradient(to right,rgba(var(--shc),.08),rgba(var(--shc),.025) 40%,transparent)}
 .lf .s>b>i{position:absolute;inset:0;pointer-events:none}
-.lf{position:absolute;top:0;width:var(--pw);height:var(--ph);transform-style:preserve-3d;z-index:3;pointer-events:none}
+.lf{position:absolute;top:0;width:var(--pw);height:var(--ph);transform-style:preserve-3d;z-index:5;pointer-events:none}
 .lf .s{position:absolute;top:0;height:var(--ph);transform-origin:left center;transform-style:preserve-3d}
 .lf .s>b{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background-color:var(--sheet);background-repeat:no-repeat}
 .lf .s>b.k{transform:rotateY(180deg)}
 .lf .s>b>u{position:absolute;inset:0;background:rgb(var(--shc));opacity:0}
-.fb-cast{position:absolute;top:0;height:var(--ph);width:var(--pw);pointer-events:none;z-index:2;opacity:0}
+.fb-cast{position:absolute;top:0;height:var(--ph);width:var(--pw);pointer-events:none;z-index:4;opacity:0}
 /* single sheet (1–2 pages): turns over on its own axis */
 .fb-sheet{left:0;transform-style:preserve-3d;box-shadow:none}
 .fb-sheet>div{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--sheet);overflow:hidden;box-shadow:var(--paper-shadow)}
 .fb-sheet>div img{display:block;width:100%;height:100%;object-fit:contain;-webkit-user-drag:none}
 .fb-sheet>div.k{transform:rotateY(180deg)}
 .fb-sheet>div>u{position:absolute;inset:0;background:rgb(var(--shc));opacity:0;pointer-events:none}
-.rd-meta{position:absolute;left:50%;z-index:1;width:min(36rem,calc(100% - 2rem));transform:translateX(-50%);text-align:center;opacity:0}
+.rd-meta{position:absolute;left:50%;z-index:-1;width:min(36rem,calc(100vw - 2rem));text-align:center;opacity:0;transform:translateX(-50%);pointer-events:none}
+.fb-pg,.fb-sheet,.fb-stack{z-index:1}
 .rd-meta .date{font-family:var(--sans);font-size:.85rem;font-weight:500;color:var(--mute);margin:0 0 .3rem}
 .rd-meta .t{font-size:1.25rem;font-weight:500;line-height:1.25;text-wrap:balance;margin:0}
-.rd-meta a{display:inline-block;margin-top:.5rem;font-family:var(--sans);font-size:.85rem;color:var(--accent);border-bottom:1px solid currentColor}
+.rd-meta a{display:inline-block;margin-top:.5rem;font-family:var(--sans);font-size:.85rem;color:var(--accent);border-bottom:1px solid currentColor;pointer-events:auto}
 @media (prefers-reduced-motion:reduce){.fb-book{transition:none}.thumb,.feature .cover,.feature .cover img{transition:none}.grid button:hover .thumb,.grid button:focus-visible .thumb,.feature .cover:hover,.feature .cover:focus-visible{transform:none}.grid li.in-more{animation:none}.years button:active,.btn:active{transform:none}}
 @media(max-width:760px){
   .page{padding:0 1.15rem}
@@ -141,7 +142,7 @@ html.rd-lock{overflow:hidden}
 
 <div class="rd" id="reader" role="dialog" aria-modal="true" aria-labelledby="rdT">
   <div class="rd-bg"></div>
-  <div class="fb-stage" id="fbStage" aria-live="polite"><div class="fb-fly" id="fbFly"></div><div class="rd-meta" id="rdMeta"></div></div>
+  <div class="fb-stage" id="fbStage" aria-live="polite"><div class="fb-fly" id="fbFly"><div class="rd-meta" id="rdMeta"></div></div></div>
   <button class="btn ghost rd-close" id="rdClose">Lukk</button>
 </div>
 </div>
@@ -243,9 +244,12 @@ const im=i=>i>=1&&i<=N?`<img src="${PS(i)}" alt="Side ${i} av ${N}" draggable="f
 const ex=i=>i>=1&&i<=N;
 function pgHTML(i,side,shade){if(!ex(i))return '';const sp=two&&shade?(side==='l'?' sp-l':' sp-r'):'';return `<div class="fb-pg ${two?side:'c'}${sp}" data-p="${i}">${im(i)}</div>`;}
 function stackHTML(){return N>=3?`<div class="fb-stack" style="${two?'right:0':'left:0'};opacity:${pos===1?1:0}"><i></i><i></i></div>`:'';}
+function parkMeta(){if(meta.parentElement===book)book.removeChild(meta);}
+function placeMeta(){if(phase!=='closed'&&book)book.appendChild(meta);}
+function setBookHTML(html){parkMeta();book.innerHTML=html;placeMeta();}
 function draw(){
-  if(mode==='sheet'){book.innerHTML=`<div class="fb-sheet" style="transform:rotateY(${sheetA}deg)"><div class="f">${im(1)}<u></u></div><div class="k">${N>1?im(2):''}<u></u></div></div>`;return;}
-  const v=spread(pos);book.innerHTML=stackHTML()+(two?pgHTML(v[0],'l',ex(v[1]))+pgHTML(v[1],'r',ex(v[0])):pgHTML(v[0],'c'));
+  if(mode==='sheet'){setBookHTML(`<div class="fb-sheet" style="transform:rotateY(${sheetA}deg)"><div class="f">${im(1)}<u></u></div><div class="k">${N>1?im(2):''}<u></u></div></div>`);return;}
+  const v=spread(pos);setBookHTML(stackHTML()+(two?pgHTML(v[0],'l',ex(v[1]))+pgHTML(v[1],'r',ex(v[0])):pgHTML(v[0],'c')));
   book.style.setProperty('--shift',shiftFor(pos)+'px');
   [pos+1,pos+2,pos+3].forEach(i=>{if(i<=N)new Image().src=PS(i);});
 }
@@ -256,7 +260,7 @@ function layout(){
   R.style.setProperty('--pw',pw+'px');R.style.setProperty('--ph',ph+'px');R.style.setProperty('--cols',cols);
   const bt=top+Math.max(0,(r.height-top-metaH-ph)/2);
   book.style.left=(r.width-cols*pw)/2+'px';book.style.top=bt+'px';
-  meta.style.top=bt+ph+(narrow?16:22)+'px';
+  meta.style.top=(ph+(narrow?16:22))+'px';
   if(two&&pos>1&&pos%2===1)pos--;
   book.style.transition='none';draw();void book.offsetWidth;book.style.transition='';
 }
@@ -287,7 +291,9 @@ async function openReader(d,el){
   pages[0]=el.currentSrc||src(d,720);
   mode=N>=3?'book':'sheet';pos=1;sheetA=0;T=null;S=null;
   meta.innerHTML=`<p class="date">${fDate(d.d)}</p><h2 class="t" id="rdT">${esc(title(d.t))}</h2>${!m&&d.pdf?`<a href="https://drive.google.com/file/d/${encodeURIComponent(d.pdf)}/view" target="_blank" rel="noopener">Åpne i Google Drive</a>`:''}`;
-  fly.innerHTML='<div class="fb-book" id="fbBook"></div>';book=fly.firstChild;fly.style.transform='none';
+  fly.querySelector('.fb-book')?.remove();
+  book=document.createElement('div');book.className='fb-book';book.id='fbBook';fly.appendChild(book);
+  book.appendChild(meta);fly.style.transform='none';
   chrome().forEach(e=>e.style.opacity=0);R.querySelector('.rd-bg').style.opacity=0;
   R.classList.add('on');document.documentElement.classList.add('rd-lock');layout();
   restRect=visibleRect();
@@ -334,7 +340,7 @@ async function closeReader(){
   if(phase==='closing')finish();
 }
 function teardown(){
-  if(flyAnim){flyAnim.cancel();flyAnim=null;}fly.getAnimations().forEach(a=>a.cancel());fly.innerHTML='';fly.style.transform='';fly.style.transformOrigin='';
+  if(flyAnim){flyAnim.cancel();flyAnim=null;}fly.getAnimations().forEach(a=>a.cancel());parkMeta();fly.querySelector('.fb-book')?.remove();fly.appendChild(meta);fly.style.transform='';fly.style.transformOrigin='';
   R.classList.remove('on');document.documentElement.classList.remove('rd-lock');
   [R.querySelector('.rd-bg'),...chrome()].forEach(e=>{e.getAnimations().forEach(a=>a.cancel());e.style.opacity=0;});
   cleanup.forEach(f=>f());cleanup=[];T=null;S=null;phase='closed';
@@ -373,10 +379,10 @@ function makeLeaf(frontI,backI,left,shF,shB){
 function prepTurn(a,b){
   const va=spread(a),vb=spread(b),cast=document.createElement('div');cast.className='fb-cast';
   let leaf;
-  if(two){book.innerHTML=pgHTML(va[0],'l',true)+pgHTML(vb[1],'r',true);
+  if(two){setBookHTML(pgHTML(va[0],'l',true)+pgHTML(vb[1],'r',true));
     leaf=makeLeaf(va[1],vb[0],pw,ex(va[0]),ex(vb[1]));cast.style.left=pw+'px';
     book.style.setProperty('--shift','0px');
-  }else{book.innerHTML=pgHTML(vb[0],'c');leaf=makeLeaf(va[0],0,0);}
+  }else{setBookHTML(pgHTML(vb[0],'c'));leaf=makeLeaf(va[0],0,0);}
   book.appendChild(cast);book.appendChild(leaf.el);
   return (p,cd=1)=>{leaf.set(p,cd);const lift=Math.sin(Math.PI*p);
 
