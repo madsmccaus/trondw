@@ -42,19 +42,24 @@ a{color:inherit;text-decoration:none}
 .theme:focus-visible{outline:none}.theme:focus-visible .track{outline:2px solid var(--ink);outline-offset:2px}
 footer.site{display:flex;flex-direction:column;align-items:center;gap:1.1rem;padding:5rem 0 3rem;font-family:var(--sans);font-size:.85rem;color:var(--mute)}
 footer.site p{margin:0}
-/* page-to-page: old and new views overlap; header stays put; title morph when opening a post */
+/* page-to-page: header stays put; post title morphs as one element (group transform only) */
 @keyframes vt-out{to{opacity:0}}
 @keyframes vt-in{from{opacity:0}}
 @media (prefers-reduced-motion:no-preference){
   @view-transition{navigation:auto}
+  --vt-ease:cubic-bezier(.32,.72,0,1);
   ::view-transition-old(root){animation:vt-out .12s ease-in both}
-  ::view-transition-new(root){animation:vt-in .18s cubic-bezier(.32,.72,0,1) .06s both}
+  ::view-transition-new(root){animation:vt-in .18s var(--vt-ease) .04s both}
   ::view-transition-group(site-head){animation:none}
   ::view-transition-old(site-head){animation:none;opacity:0}
   ::view-transition-new(site-head){animation:none}
-  ::view-transition-group(post-title){animation-duration:.26s;animation-delay:.04s;animation-timing-function:cubic-bezier(.32,.72,0,1)}
-  ::view-transition-old(post-title){animation:vt-out .08s ease-in both}
-  ::view-transition-new(post-title){animation:vt-in .12s cubic-bezier(.32,.72,0,1) .04s both}
-  html.vt-morph::view-transition-new(root){animation:vt-in .18s cubic-bezier(.32,.72,0,1) .14s both}
+  /* shared title: no old/new cross-fade — only ::view-transition-group moves and scales */
+  ::view-transition-group(post-title){animation-duration:.22s;animation-timing-function:var(--vt-ease);overflow:visible}
+  ::view-transition-old(post-title){animation:none!important;opacity:0!important}
+  ::view-transition-new(post-title){animation:none!important;opacity:1!important}
+  ::view-transition-image-pair(post-title){height:100%;width:100%}
+  /* morph: fast out, body in overlaps the last 40% of the title move (~300ms total) */
+  html.vt-morph ::view-transition-old(root){animation:vt-out .12s ease-out both}
+  html.vt-morph ::view-transition-new(root){animation:vt-in .18s var(--vt-ease) .132s both}
 }
 @media(max-width:760px){.site-head{padding:2rem 1.15rem 0}.site-nav{gap:1.1rem}}

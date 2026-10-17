@@ -23,7 +23,7 @@ function homeHTML(all,meta){const n=meta.total_posts!=null?fmt(meta.total_posts)
   return (all.length?all.map(p=>`
     <article class="entry">
       <p class="date">${TW.date(p.d)}${tag(p)}</p>
-      <h2 class="title"><a href="${postHref(p.m,p.i)}" data-k="${TW.esc(key(p.m,p.i))}">${TW.esc(p.t)}</a></h2>
+      <h2 class="title" data-k="${TW.esc(key(p.m,p.i))}"><a href="${postHref(p.m,p.i)}">${TW.esc(p.t)}</a></h2>
       <p class="excerpt">${TW.esc(TW.preview(p.x,280))}</p>
       <a class="more" href="${postHref(p.m,p.i)}">Les videre →</a>
     </article>`).join(''):'<p class="empty">Ingen nye innlegg ennå.</p>')+`
