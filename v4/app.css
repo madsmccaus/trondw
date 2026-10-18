@@ -1,6 +1,6 @@
 /* Forside, Arkiv and the posts: one page that changes in place */
 .page{max-width:42rem;margin:0 auto;padding:0 1.5rem}
-main{padding-top:1.5rem;min-height:60vh}
+main{min-height:60vh}
 #root{background:var(--paper)}
 .entry{padding:2.75rem 0}
 .entry + .entry{padding-top:0}
