@@ -89,8 +89,8 @@ async function view(u,from){
   return {title:'Trond Worren',nav:'/v4',html:homeHTML(await posts(),await getMeta())};
 }
 function focusView(){const h=root.querySelector('h1:not(.sr)');
-  if(h){if(!h.hasAttribute('tabindex'))h.setAttribute('tabindex','-1');h.focus({preventScroll:true});return;}
-  if(!root.hasAttribute('tabindex'))root.setAttribute('tabindex','-1');root.focus({preventScroll:true});}
+  if(h){h.setAttribute('tabindex','-1');h.focus({preventScroll:true});return;}
+  root.setAttribute('tabindex','-1');root.focus({preventScroll:true});}
 function setNav(v){document.querySelectorAll('.site-nav a').forEach(a=>{if(a.getAttribute('href')===v.nav)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});}
 function paint(v,{focus=false}={}){document.title=v.title;root.innerHTML=v.html;setNav(v);
   topBtn();if(focus)focusView();}

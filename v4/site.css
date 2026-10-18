@@ -18,8 +18,12 @@ html{font-size:18px;-webkit-font-smoothing:antialiased;text-rendering:optimizeLe
 html.theme-switching,html.theme-switching *{transition:none!important}
 ::selection{background:color-mix(in oklab,var(--accent) 18%,transparent);color:var(--ink)}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);line-height:1.55}
+a,button{-webkit-tap-highlight-color:transparent}
 a{color:inherit;text-decoration:none}
+:focus{outline:none}
 :focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+/* programmatic focus after in-app navigation (tabindex=-1) */
+[tabindex="-1"]:focus,[tabindex="-1"]:focus-visible{outline:none}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 /* one header for every page: same place, width and type */
 .site-head{max-width:72rem;margin:0 auto;padding:2.5rem 2rem 0;display:flex;flex-direction:column;align-items:center;gap:.35rem;text-align:center;view-transition-name:site-head}
@@ -30,6 +34,7 @@ a{color:inherit;text-decoration:none}
 .site-nav a::before{content:"";position:absolute;left:-.55rem;right:-.55rem;top:50%;transform:translateY(-50%);height:2.5rem}
 @media (hover:none),(pointer:coarse){.site-nav a::before{height:2.75rem}}
 .site-nav a[aria-current="page"]{border-bottom-color:currentColor}
+.site-nav a:active{opacity:.72;transition:opacity 120ms ease-out}
 @media (hover:hover) and (pointer:fine){.site-nav a:hover{border-bottom-color:currentColor}}
 /* switch, Radix-style: a track and a thumb, role="switch" */
 .theme{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;font:inherit;color:var(--mute);background:none;border:0;padding:.5rem;margin:-.5rem;cursor:pointer;transition:transform 150ms ease-out}

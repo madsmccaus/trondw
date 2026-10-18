@@ -5,6 +5,7 @@ main{padding-top:1.5rem;min-height:60vh}
 .entry + .entry{padding-top:0}
 .date{font-family:var(--sans);font-size:.9rem;font-weight:500;color:var(--mute);margin:0 0 .55rem;font-variant-numeric:tabular-nums}
 .title{font-size:1.7rem;font-weight:500;line-height:1.2;letter-spacing:-0.005em;margin:0 0 .8rem;text-wrap:balance}
+.title a:active,.more:active,.back:active,.archive a:active,.row a:active,.ark-years a:active,.ark-months a:active,.ark-year-list a:active{opacity:.72}
 @media (hover:hover) and (pointer:fine){.title a:hover,.row a:hover{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.18em}}
 .excerpt{font-size:1.2rem;line-height:1.6;color:var(--ink);margin:0 0 1rem;max-width:65ch;text-wrap:pretty;font-variant-numeric:oldstyle-nums}
 .more{font-family:var(--sans);font-size:.9rem;font-weight:500;color:var(--accent);border-bottom:1px solid currentColor;padding-bottom:1px}
@@ -34,7 +35,7 @@ main{padding-top:1.5rem;min-height:60vh}
 @media (hover:none),(pointer:coarse){.ark-years a::before,.ark-months a::before{inset:-.45rem -.1rem}}
 @media (hover:hover) and (pointer:fine){.ark-years a:hover,.ark-months a:hover{background:var(--hover)}}
 .ark-years a[aria-current="page"],.ark-months a[aria-current="page"]{background:var(--ink);color:var(--paper)}
-.ark-years a:active,.ark-months a:active{transform:scale(.97);transition:transform 150ms ease-out}
+.ark-years a:active,.ark-months a:active{transform:scale(.97);transition:transform 150ms ease-out,opacity 120ms ease-out}
 @media (hover:hover) and (pointer:fine){.ark-months a:hover{color:var(--ink)}}
 .ark-count{text-align:center;font-family:var(--sans);font-size:.9rem;color:var(--mute);margin:0 0 3rem;font-variant-numeric:tabular-nums}
 .ark-intro{margin-top:.5rem}

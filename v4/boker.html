@@ -26,7 +26,7 @@
 .actions{display:flex;gap:.75rem;flex-wrap:wrap;justify-content:center}
 .btn{display:inline-flex;align-items:center;gap:.5rem;height:2.6rem;padding:0 1.1rem;border-radius:6px;font-family:var(--sans);font-size:.9rem;font-weight:500;border:1px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer;transition:background .15s,color .15s,transform 150ms ease-out}
 @media (hover:hover) and (pointer:fine){.btn:hover{background:color-mix(in oklab,var(--ink) 88%,var(--paper));border-color:color-mix(in oklab,var(--ink) 88%,var(--paper))}}
-.btn:active{transform:scale(.97)}
+.btn:active{transform:scale(.97);opacity:.92}
 .btn.ghost{background:transparent;color:var(--ink);border-color:rgba(var(--shc),.35)}
 @media (hover:hover) and (pointer:fine){.btn.ghost:hover{background:var(--hover)}}
 /* browse */
@@ -36,7 +36,7 @@
 .years button::before{content:"";position:absolute;inset:-.35rem -.15rem}
 @media (hover:none),(pointer:coarse){.years button::before{inset:-.45rem -.15rem}}
 @media (hover:hover) and (pointer:fine){.years button:hover{background:var(--hover)}}
-.years button:active{transform:scale(.97)}
+.years button:active{transform:scale(.97);opacity:.85}
 .years button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
 .grid{list-style:none;margin:0 auto;padding:0;max-width:72rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(10.5rem,1fr));gap:3.5rem 2.75rem}
 .grid li{margin:0}
