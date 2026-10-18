@@ -94,12 +94,29 @@ function focusView(){const h=root.querySelector('h1:not(.sr)');
 function setNav(v){document.querySelectorAll('.site-nav a').forEach(a=>{if(a.getAttribute('href')===v.nav)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});}
 function paint(v,{focus=false}={}){document.title=v.title;root.innerHTML=v.html;setNav(v);
   topBtn();if(focus)focusView();}
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const raf2=()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+const scrollNow=(top=0)=>scrollTo({top,left:0,behavior:'instant'});
+
+// Sequential fade: old content fully out before paint/scroll, then new in (no VT snapshot overlap).
+let navBusy=false;
+async function crossfade(apply){
+  if(reduce.matches){apply();return;}
+  if(navBusy){apply();return;}
+  navBusy=true;
+  try{
+    root.style.transition='opacity 120ms ease-out';
+    root.style.opacity='0';
+    await wait(120);
+    root.style.transition='none';
+    apply();
+    await raf2();
+    root.style.transition='opacity 160ms ease-out';
+    root.style.opacity='1';
+    await wait(160);
+  }finally{root.style.transition='';root.style.opacity='';navBusy=false;}}
 
 // ── navigation ──
-const named=[];
-function name(el,n){if(el){el.style.viewTransitionName=n;named.push(el);}}
-function unname(){named.splice(0).forEach(el=>el.style.viewTransitionName='');}
-let busy=null;
 async function go(url,{push=true}={}){
   const u=new URL(url,location.href);
   const toPost=!!(u.searchParams.get('m')&&u.searchParams.get('i'));
@@ -107,21 +124,16 @@ async function go(url,{push=true}={}){
   const apply=()=>{
     const st=history.state||{};
     if(u.hash&&push){const t=document.getElementById(u.hash.slice(1));if(t){paint(v);t.scrollIntoView({behavior:'instant'});return;}}
-    if(toPost)scrollTo(0,0);
-    else if(!push)scrollTo(0,st.y||0);
     paint(v,{focus:false});
-    if(toPost)scrollTo(0,0);
-    if(u.hash){document.getElementById(u.hash.slice(1))?.scrollIntoView({behavior:'instant'});}};
+    if(toPost)scrollNow(0);
+    else if(!push)scrollNow(st.y||0);
+    else if(!u.hash)scrollNow(0);
+    if(u.hash)document.getElementById(u.hash.slice(1))?.scrollIntoView({behavior:'instant'});};
   if(push){history.replaceState({...(history.state||{}),y:scrollY},'');
     const from=location.pathname+location.search;
     history.pushState({y:0,from:u.searchParams.get('m')?from:''},'',u);}
-  if(!document.startViewTransition||reduce.matches){apply();focusView();return;}
-  if(busy)busy.skipTransition();
-  unname();
-  name(document.querySelector('.site-head'),'site-head');
-  name(root,'page-content');
-  busy=document.startViewTransition(apply);
-  busy.finished.finally(()=>{unname();busy=null;focusView();});
+  await crossfade(apply);
+  focusView();
 }
 if('scrollRestoration' in history)history.scrollRestoration='manual';
 document.addEventListener('click',e=>{const a=e.target.closest('a[href]');

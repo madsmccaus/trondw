@@ -55,7 +55,7 @@ footer.site p{margin:0}
   @view-transition{navigation:auto}
   ::view-transition-group(site-head){animation:none}
   ::view-transition-old(site-head),::view-transition-new(site-head){animation:none}
-  ::view-transition-old(page-content){animation:vt-out .18s ease-out both}
-  ::view-transition-new(page-content){animation:vt-in .18s ease-out both}
+  ::view-transition-old(page-content){animation:vt-out .12s ease-out both}
+  ::view-transition-new(page-content){animation:vt-in .16s ease-out .12s both}
 }
 @media(max-width:760px){.site-head{padding:2rem 1.15rem 0}.site-nav{gap:1.1rem}}
