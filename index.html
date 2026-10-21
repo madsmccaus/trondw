@@ -4,55 +4,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Trond Worren</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Noto+Serif:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/classic.css">
+<script src="/theme.js"></script>
+<link rel="preload" href="/fonts/EBGaramond-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/EBGaramond-Italic-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/site.css">
+<script type="speculationrules">{"prefetch":[{"source":"document","where":{"href_matches":"/*"},"eagerness":"moderate"}]}</script>
+<link rel="stylesheet" href="/app.css">
 <script src="/lib/sanitize.js"></script>
-<script src="/shell.js"></script>
+<script src="/tw.js"></script>
+<script src="/site.js" defer></script>
+<script src="/app.js" defer></script>
 </head>
 <body>
-<div class="site">
-<aside class="sidebar"><div class="sidebar-inner">
-  <a class="site-title" href="/">Trond Worren</a>
-  <p class="site-desc">Tidligere tigger, uteligger.</p>
-  <nav aria-label="Hovedmeny"><ul class="nav">
-    <li><a href="/" aria-current="page">Siste innlegg</a></li>
-    <li><a href="/arkiv">Arkiv</a></li>
-  </ul></nav>
-  <div class="widget">
-    <h2 class="widget-title">Arkivet</h2>
-    <p>4 486 innlegg og håndskrevne dagbøker fra 2016 til 2022, bevart fra trondworren.net.</p>
-    <a class="btn" href="/arkiv">Åpne arkivet →</a>
-  </div>
-</div></aside>
-<main class="main"><div class="main-inner">
-  <h1 class="section-label">Siste innlegg</h1>
-  <div id="posts"><p class="empty">Laster…</p></div>
-  <section class="archive-cta">
-    <div><h2>Arkivet</h2><p>Bla i dagbøkene, diktene og alle innleggene fra 2016–2022.</p></div>
-    <a class="btn btn-primary" href="/arkiv">Gå til arkivet →</a>
-  </section>
-  <footer class="site-footer">Alt innhold tilhører Trond Worren</footer>
-</div></main>
+<header class="site-head">
+  <a class="mast" href="/">Trond Worren</a>
+  <p class="tag">Tidligere tigger, uteligger.</p>
+  <nav class="site-nav" aria-label="Hovedmeny"><a href="/" aria-current="page">Forside</a><a href="/arkiv">Arkiv</a><a href="/boker">Bøker</a><a href="/om">Om</a></nav>
+</header>
+<div class="page">
+  <main id="root"></main>
+  <footer class="site"><p>Alt innhold tilhører Trond Worren</p><button class="theme" id="theme" type="button" role="switch" aria-checked="false" aria-label="Mørk modus"><span class="track"><span class="thumb"></span></span></button></footer>
 </div>
-<script>
-(async () => {
-  const el = document.getElementById('posts');
-  try {
-    const posts = (await TW.latest()).map(TW.clean).filter((p) => p.x);
-    if (!posts.length) { el.innerHTML = '<p class="empty">Ingen nye innlegg ennå.</p>'; return; }
-    el.innerHTML = posts.map((p) => `
-      <article class="card">
-        <div class="card-body">
-          ${p.sample ? '<span class="badge sample">Eksempel · kun forhåndsvisning</span>' : ''}
-          <h2 class="entry-title"><a href="${TW.href(p)}">${TW.esc(p.t)}</a></h2>
-          <div class="entry-text"><p>${TW.esc(TW.preview(p.x))}</p>
-          <a class="more" href="${TW.href(p)}">Les hele innlegget<span class="sans" aria-hidden="true"> →</span></a></div>
-        </div>
-        <footer class="card-footer"><span>${TW.date(p.d)}</span><span>${TW.esc(TW.CL[p.c] || 'Annet')}</span></footer>
-      </article>`).join('');
-  } catch (e) { el.innerHTML = '<p class="empty">Kunne ikke laste innleggene.</p>'; }
-})();
-</script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build data/documents.json and cover thumbnails for the /v4/arkiv grid.
+"""Build data/documents.json and cover thumbnails for the /boker grid.
 
 Documents are the archive posts whose content on trondworren.net was a scanned
 document: a first-page image plus (usually) a Google Drive PDF. Input is the

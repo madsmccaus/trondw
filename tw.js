@@ -1,4 +1,4 @@
-// Shared helpers for the classic pages and /v4
+// Shared helpers for the site (homepage, archive SPA, posts)
 const TW = {
   MNF: ['januar','februar','mars','april','mai','juni','juli','august','september','oktober','november','desember'],
   esc: (s) => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'),

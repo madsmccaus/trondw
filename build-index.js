@@ -59,7 +59,7 @@ allPosts.sort((a, b) => a.d.localeCompare(b.d));
 console.log(`\nTotal posts: ${allPosts.length}`);
 console.log(`Date range: ${allPosts[0].d} to ${allPosts[allPosts.length - 1].d}`);
 
-// data/arkiv/YYYY.json: every written post of a year for the /v4/arkiv index,
+// data/arkiv/YYYY.json: every written post of a year for the /arkiv index,
 // with a short first-line excerpt so near-identical titles can be told apart
 {
   const { sanitizeSubject, sanitizeEmailContent } = require('./lib/sanitize');

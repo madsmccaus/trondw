@@ -8,12 +8,12 @@ const OUT = process.env.OUT || '/opt/cursor/artifacts/screenshots';
 const label = process.env.LABEL || 'before';
 
 const routes = [
-  { name: 'home', url: `${BASE}/v4` },
-  { name: 'post', url: `${BASE}/v4?m=2026-10&i=1` },
-  { name: 'arkiv', url: `${BASE}/v4/arkiv` },
-  { name: 'arkiv-2020', url: `${BASE}/v4/arkiv?y=2020` },
-  { name: 'boker', url: `${BASE}/v4/boker` },
-  { name: 'om', url: `${BASE}/v4/om` },
+  { name: 'home', url: `${BASE}/` },
+  { name: 'post', url: `${BASE}/?m=2026-09&i=0` },
+  { name: 'arkiv', url: `${BASE}/arkiv` },
+  { name: 'arkiv-2020', url: `${BASE}/arkiv?y=2020` },
+  { name: 'boker', url: `${BASE}/boker` },
+  { name: 'om', url: `${BASE}/om` },
 ];
 
 async function measure(page) {
@@ -107,7 +107,7 @@ for (const vp of [{ tag: '390', w: 390, h: 844, device: devices['iPhone 13'] }, 
     vp.device ? { ...vp.device, viewport: { width: vp.w, height: vp.h } } : { viewport: { width: vp.w, height: vp.h } }
   );
   const page = await ctx.newPage();
-  await page.goto(`${BASE}/v4`, { waitUntil: 'networkidle' });
+  await page.goto(`${BASE}/`, { waitUntil: 'networkidle' });
   const home = await measure(page);
   await page.locator('.entry .title a').first().click();
   await page.waitForTimeout(400);

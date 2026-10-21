@@ -14,7 +14,8 @@ async function find(m,i){const all=await posts();const p=all.find(x=>x.m===m&&St
   monthFiles[m]=monthFiles[m]||getJSON(`/data/${m}.json`);
   const hit=((await monthFiles[m])||[]).find(x=>String(x.i)===i);return hit?TW.clean({...hit,m}):null;}
 const key=(m,i)=>`${m}/${i}`;
-const postHref=(m,i)=>`/v4?m=${encodeURIComponent(m)}&i=${encodeURIComponent(i)}`;
+const postHref=(m,i)=>`/?m=${encodeURIComponent(m)}&i=${encodeURIComponent(i)}`;
+const spaPath=p=>p==='/'||p==='/arkiv';
 const tag=p=>p.sample?' · <span class="sample">Eksempel</span>':'';
 
 function archiveMonths(rows){
@@ -24,11 +25,11 @@ function archiveMonths(rows){
   return Array.from({length:12},(_,i)=>{const mo=String(i+1).padStart(2,'0');return{mo,rows:byMo.get(mo)||[]};});
 }
 function archiveNavHTML(y,groups,hashMo){
-  const years=YEARS.map(([yy])=>`<a href="/v4/arkiv?y=${yy}"${y&&yy===y?' aria-current="page"':''}>${yy}</a>`).join('');
+  const years=YEARS.map(([yy])=>`<a href="/arkiv?y=${yy}"${y&&yy===y?' aria-current="page"':''}>${yy}</a>`).join('');
   const months=groups.map((g,i)=>{const label=MO_ABBR[i];
     if(!g.rows.length)return `<span class="mo-empty" aria-hidden="true">${label}</span>`;
     const cur=hashMo===g.mo?' aria-current="page"':'';
-    return `<a href="/v4/arkiv?y=${y}#m-${g.mo}"${cur}>${label}</a>`;}).join('');
+    return `<a href="/arkiv?y=${y}#m-${g.mo}"${cur}>${label}</a>`;}).join('');
   return `<div class="ark-nav" aria-label="Arkivnavigasjon">
     <nav class="ark-years" aria-label="År">${years}</nav>
     <nav class="ark-months" aria-label="Måneder">${months}</nav></div>`;}
@@ -37,7 +38,7 @@ function monthBodyHTML(y,groups){
     g.rows.map(r=>`<li class="row"><p class="date">${TW.date(r[1])}</p><h3><a href="${postHref(r[3],r[0])}">${TW.esc(r[2])}</a></h3>${r[4]?`<p class="x">${TW.esc(r[4])}</p>`:''}</li>`).join('')}</ol></section>`).join('');}
 function archiveIndexBody(){
   return `<div class="ark-intro"><p class="ark-lead">Velg et år for å bla i innlegg.</p>
-    <ul class="ark-year-list">${YEARS.map(([yy,n])=>`<li><a href="/v4/arkiv?y=${yy}">${yy}</a><span class="n">${fmt(n)} innlegg</span></li>`).join('')}</ul></div>`;}
+    <ul class="ark-year-list">${YEARS.map(([yy,n])=>`<li><a href="/arkiv?y=${yy}">${yy}</a><span class="n">${fmt(n)} innlegg</span></li>`).join('')}</ul></div>`;}
 function archiveHTML(y,rows,hashMo){
   const groups=y?archiveMonths(rows):Array.from({length:12},(_,i)=>({mo:String(i+1).padStart(2,'0'),rows:[]}));
   const body=y?monthBodyHTML(y,groups):archiveIndexBody();
@@ -59,34 +60,36 @@ function homeHTML(all,meta){const n=meta.total_posts!=null?fmt(meta.total_posts)
       <a class="more" href="${postHref(p.m,p.i)}">Les videre →</a>
     </article>`).join(''):'<p class="empty">Ingen nye innlegg ennå.</p>')+`
     <section class="archive">
-      <a href="/v4/arkiv">Gå til arkivet →</a>
+      <a href="/arkiv">Gå til arkivet →</a>
       <p>${n?`${n} innlegg fra ${range}.`:`Innlegg fra ${range}.`}</p>
     </section>`;}
-function postHTML(p,from){const back=from&&from.startsWith('/v4/arkiv')
-    ?`<a class="back" href="${TW.esc(from)}" data-back>← Tilbake til arkivet</a>`:'<a class="back" href="/v4" data-back>← Tilbake til forsiden</a>';
+function postHTML(p,from){const back=from&&from.startsWith('/arkiv')
+    ?`<a class="back" href="${TW.esc(from)}" data-back>← Tilbake til arkivet</a>`:'<a class="back" href="/" data-back>← Tilbake til forsiden</a>';
+  const orig=p.u?`<p class="orig"><a href="https://web.archive.org/web/2026/${TW.esc(p.u)}" target="_blank" rel="noopener">Opprinnelig innlegg (arkivert kopi) ↗</a></p>`:'';
   return `${back}
     <article class="article">
       <p class="date">${TW.date(p.d)}${tag(p)}</p>
       <h1>${TW.esc(p.t)}</h1>
       <div class="body">${TW.paras(p.x)}</div>
+      ${orig}
     </article>
     <p class="back-tail">${back}</p>`;}
 async function view(u,from){
   const q=u.searchParams;
-  if(u.pathname==='/v4/arkiv'){
+  if(u.pathname==='/arkiv'){
     YEARS=YEARS||(await getJSON('/data/arkiv/years.json'))||[];
     const want=q.get('y');
     const hashMo=u.hash.match(/^#m-(\d{2})$/)?.[1]||'';
     if(!want){
-      return {title:'Arkiv · Trond Worren',nav:'/v4/arkiv',html:archiveHTML(null,[],hashMo)};}
+      return {title:'Arkiv · Trond Worren',nav:'/arkiv',html:archiveHTML(null,[],hashMo)};}
     const y=YEARS.some(([yy])=>yy===want)?want:(YEARS.length?YEARS[YEARS.length-1][0]:'');
     yearFiles[y]=yearFiles[y]||getJSON(`/data/arkiv/${y}.json`);const rows=(await yearFiles[y])||[];
-    return {title:`Arkiv ${y} · Trond Worren`,nav:'/v4/arkiv',html:archiveHTML(y,rows,hashMo)};}
+    return {title:`Arkiv ${y} · Trond Worren`,nav:'/arkiv',html:archiveHTML(y,rows,hashMo)};}
   const m=q.get('m'),i=q.get('i');
   if(m&&i){const p=await find(m,i);
     if(!p)return {title:'Trond Worren',nav:'',html:'<p class="empty">Fant ikke innlegget.</p>'};
     return {title:`${p.t} · Trond Worren`,nav:'',html:postHTML(p,from!==undefined?from:((history.state&&history.state.from)||''))};}
-  return {title:'Trond Worren',nav:'/v4',html:homeHTML(await posts(),await getMeta())};
+  return {title:'Trond Worren',nav:'/',html:homeHTML(await posts(),await getMeta())};
 }
 function focusView(){const h=root.querySelector('h1:not(.sr)');
   if(h){h.setAttribute('tabindex','-1');h.focus({preventScroll:true});return;}
@@ -139,10 +142,10 @@ if('scrollRestoration' in history)history.scrollRestoration='manual';
 document.addEventListener('click',e=>{const a=e.target.closest('a[href]');
   if(!a||e.defaultPrevented||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button||a.target)return;
   const u=new URL(a.href,location.href);if(u.origin!==location.origin)return;
-  if(u.pathname!=='/v4'&&u.pathname!=='/v4/arkiv')return;
+  if(!spaPath(u.pathname))return;
   if(u.pathname===location.pathname&&u.search===location.search&&u.hash)return;
   e.preventDefault();
-  if(a.hasAttribute('data-back')){const st=history.state||{};const want=st.from||'/v4';
+  if(a.hasAttribute('data-back')){const st=history.state||{};const want=st.from||'/';
     if(history.length>1&&st.prev===want){history.back();return;}}
   go(u.href,{push:true});});
 const _push=history.pushState.bind(history);

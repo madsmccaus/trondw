@@ -4,15 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Om · Trond Worren</title>
-<script src="/v4/theme.js"></script>
+<script src="/theme.js"></script>
 <link rel="preload" href="/fonts/EBGaramond-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/EBGaramond-Italic-var.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/v4/site.css">
-<script type="speculationrules">{"prefetch":[{"source":"document","where":{"href_matches":"/v4*"},"eagerness":"moderate"}]}</script>
+<link rel="stylesheet" href="/site.css">
+<script type="speculationrules">{"prefetch":[{"source":"document","where":{"href_matches":"/*"},"eagerness":"moderate"}]}</script>
 <style>
 .page{max-width:42rem;margin:0 auto;padding:0 1.5rem}
 main.page-content{padding-top:3rem}
-main.page-content h1{font-size:clamp(2rem,5vw,2.6rem);font-weight:500;line-height:1.15;margin:0 0 1.75rem;text-wrap:balance}
+main.page-content blockquote:first-of-type{margin-top:0}
 main.page-content h2{font-size:1.5rem;font-weight:500;line-height:1.2;margin:4rem 0 1.25rem;text-wrap:balance}
 main.page-content p{font-size:1.2rem;line-height:1.65;margin:0 0 1.1em;max-width:65ch}
 main.page-content blockquote{margin:0 0 2rem;padding:0}
@@ -28,17 +28,17 @@ main.page-content .media .y{display:block;margin-top:.15rem}
 main.page-content .src{font-family:var(--sans);font-size:.9rem;color:var(--mute)}
 @media(max-width:600px){.page{padding:0 1.15rem}main.page-content p{font-size:1.125rem}}
 </style>
-<script src="/v4/site.js" defer></script>
+<script src="/site.js" defer></script>
 </head>
 <body>
 <header class="site-head">
-  <a class="mast" href="/v4">Trond Worren</a>
+  <a class="mast" href="/">Trond Worren</a>
   <p class="tag">Tidligere tigger, uteligger.</p>
-  <nav class="site-nav" aria-label="Hovedmeny"><a href="/v4">Forside</a><a href="/v4/arkiv">Arkiv</a><a href="/v4/boker">Bøker</a><a href="/v4/om" aria-current="page">Om</a></nav>
+  <nav class="site-nav" aria-label="Hovedmeny"><a href="/">Forside</a><a href="/arkiv">Arkiv</a><a href="/boker">Bøker</a><a href="/om" aria-current="page">Om</a></nav>
 </header>
 <div class="page">
   <main class="page-content">
-    <h1>Om denne siden</h1>
+    <h1 class="sr">Om</h1>
     <blockquote>
       <p>Trond Worren er et kjent ansikt fra Universitetsgata i Oslo, der han med sitt lange skjegg har pleid å stå utenfor Norli bokhandel og selge sine kristne dikt. Kanskje i 10 år?</p>
       <footer>– <a class="u" href="https://www.facebook.com/FolkErFolk/posts/593936520684751">Folk er Folk</a>, 21. februar 2014.</footer>
