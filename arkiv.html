@@ -531,7 +531,7 @@ async function openP(fi){
   const near=IX.filter(p=>{if(p.i===post.i)return false;return Math.abs(new Date(p.d+'T12:00:00')-pd)/864e5<=3;}).slice(0,5);
   let ctx='';if(near.length){ctx=`<div class="dtl-ctx"><div class="ctx-h">Rundt samme tid</div>${near.map(p=>`<div class="ctx-lk" data-gi="${p.i}"><span class="ctx-d">${fShort(p.d)}</span><span class="ctx-t">${esc(p.t)}</span><span class="ctx-c">${CL[p.c]||p.c}</span></div>`).join('')}</div>`;}
   const u=full&&full.u?full.u:'';
-  bd.innerHTML=`<div class="dtl-cat">${CL[post.c]||post.c}</div><h2 class="dtl-title">${esc(post.t)}</h2><div class="dtl-date">${fFull(post.d)}</div>${txt}${ctx}${u?`<div style="margin-top:24px"><a href="${esc(u)}" target="_blank" style="font-size:.85rem;color:var(--fg3)">Opprinnelig innlegg ↗</a></div>`:''}`;
+  bd.innerHTML=`<div class="dtl-cat">${CL[post.c]||post.c}</div><h2 class="dtl-title">${esc(post.t)}</h2><div class="dtl-date">${fFull(post.d)}</div>${txt}${ctx}${u?`<div style="margin-top:24px"><a href="https://web.archive.org/web/2026/${esc(u)}" target="_blank" style="font-size:.85rem;color:var(--fg3)">Opprinnelig innlegg (arkivert kopi) ↗</a></div>`:''}`;
   bd.querySelectorAll('.ctx-lk').forEach(el=>{el.onclick=()=>{const gi=+el.dataset.gi;let i=filtered.findIndex(p=>p.i===gi);if(i>=0){openP(i);return;}aCat=null;aYear=null;sQ='';document.getElementById('arkS').value='';filtered=IX;renderAL();renderArkF();renderArkTags();updAC();switchTab('arkiv');i=filtered.findIndex(p=>p.i===gi);if(i>=0)openP(i);};});
 }
 function closeP(){document.getElementById('dtlOv').classList.remove('open');document.body.style.overflow='';curI=-1;}
