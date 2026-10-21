@@ -6,9 +6,11 @@
 
 const fs = require('fs');
 const path = require('path');
+const { filterArchivePosts } = require('./lib/archive-junk');
 
 const dataDir = path.join(__dirname, 'data');
 const outputFile = path.join(dataDir, 'index.json');
+const metaFile = path.join(dataDir, 'meta.json');
 
 // Read all JSON files from data directory
 const files = fs.readdirSync(dataDir)
@@ -18,14 +20,37 @@ const files = fs.readdirSync(dataDir)
 console.log(`Found ${files.length} monthly data files`);
 
 const allPosts = [];
+const junkTotals = { wp404: 0, scrape: 0, empty: 0 };
+const junkByYear = { wp404: {}, scrape: {}, empty: {} };
 
 for (const file of files) {
   const filePath = path.join(dataDir, file);
   const content = fs.readFileSync(filePath, 'utf-8');
   const posts = JSON.parse(content);
-  
-  console.log(`${file}: ${posts.length} posts`);
-  allPosts.push(...posts.map((p) => ({ ...p, _m: file.slice(0, 7) })));
+  const { kept, removed } = filterArchivePosts(posts);
+  for (const bucket of ['wp404', 'scrape', 'empty']) {
+    for (const p of removed[bucket]) {
+      junkTotals[bucket]++;
+      const y = p.d.slice(0, 4);
+      junkByYear[bucket][y] = (junkByYear[bucket][y] || 0) + 1;
+    }
+  }
+  if (removed.wp404.length + removed.scrape.length + removed.empty.length) {
+    console.log(
+      `${file}: ${posts.length} posts (${removed.wp404.length + removed.scrape.length + removed.empty.length} junk skipped)`
+    );
+  } else {
+    console.log(`${file}: ${posts.length} posts`);
+  }
+  allPosts.push(...kept.map((p) => ({ ...p, _m: file.slice(0, 7) })));
+}
+
+const junkRemoved = junkTotals.wp404 + junkTotals.scrape + junkTotals.empty;
+if (junkRemoved) {
+  console.log(`\nSkipped ${junkRemoved} junk posts while indexing:`);
+  console.log(`  WordPress 404: ${junkTotals.wp404}`, junkByYear.wp404);
+  console.log(`  Other scrape: ${junkTotals.scrape}`, junkByYear.scrape);
+  console.log(`  Empty stubs: ${junkTotals.empty}`, junkByYear.empty);
 }
 
 // Sort by date ascending (oldest first)
@@ -34,7 +59,7 @@ allPosts.sort((a, b) => a.d.localeCompare(b.d));
 console.log(`\nTotal posts: ${allPosts.length}`);
 console.log(`Date range: ${allPosts[0].d} to ${allPosts[allPosts.length - 1].d}`);
 
-// data/arkiv/YYYY.json: every written post of a year for the /v4/arkiv index,
+// data/arkiv/YYYY.json: every written post of a year for the /arkiv index,
 // with a short first-line excerpt so near-identical titles can be told apart
 {
   const { sanitizeSubject, sanitizeEmailContent } = require('./lib/sanitize');
@@ -100,3 +125,13 @@ if (env !== 'production' && latest.length < LATEST_COUNT) {
 latest = latest.slice(0, LATEST_COUNT);
 fs.writeFileSync(path.join(dataDir, 'latest.json'), JSON.stringify(latest, null, 2));
 console.log(`✓ Wrote data/latest.json with ${latest.length} posts`);
+
+if (fs.existsSync(metaFile)) {
+  const meta = JSON.parse(fs.readFileSync(metaFile, 'utf-8'));
+  meta.total_posts = allPosts.length;
+  if (allPosts.length) {
+    meta.date_range = [allPosts[0].d, allPosts[allPosts.length - 1].d];
+  }
+  fs.writeFileSync(metaFile, JSON.stringify(meta, null, 2) + '\n');
+  console.log(`✓ Updated data/meta.json (total_posts: ${meta.total_posts})`);
+}

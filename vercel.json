@@ -14,17 +14,106 @@
       ]
     }
   ],
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/$1"
-    }
-  ],
   "redirects": [
     {
       "source": "/v4/dokumenter",
-      "destination": "/v4/boker",
+      "destination": "/boker",
       "permanent": true
+    },
+    {
+      "source": "/v4",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/v4/:path*",
+      "destination": "/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:year(\\d{4})/:path*",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/category/:path*",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/tag/:path*",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/author/:path*",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/page/:path*",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/feed",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/feed/:path*",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/comments/:path*",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/utgivelser",
+      "destination": "/om",
+      "permanent": false
+    },
+    {
+      "source": "/media",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/wp-sitemap(.*)",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/wp-content/:path*",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/wp-includes/:path*",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/wp-admin/:path*",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/wp-login.php",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/xmlrpc.php",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/wp-json/:path*",
+      "destination": "/",
+      "permanent": false
     }
   ]
 }
