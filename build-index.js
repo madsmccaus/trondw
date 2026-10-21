@@ -113,6 +113,22 @@ let latest = allPosts
   .filter((p) => p.x)
   .sort((a, b) => b.d.localeCompare(a.d) || b.i - a.i);
 
+// Until enough email posts exist, fill the homepage with the newest archive
+// posts (pre-2026 WordPress archive; the 2026 demo post is skipped).
+if (latest.length < LATEST_COUNT) {
+  const seen = new Set(latest.map((p) => `${p.m}:${p.i}`));
+  const archive = allPosts
+    .filter((p) => p.src !== 'email' && p.d < '2026' && p.x)
+    .map((p) => ({
+      m: p.d.slice(0, 7), i: p.i, d: p.d, c: p.c,
+      t: sanitizeSubject(p.t) || 'Uten tittel',
+      x: sanitizeEmailContent(p.x)
+    }))
+    .filter((p) => p.x && !seen.has(`${p.m}:${p.i}`))
+    .sort((a, b) => b.d.localeCompare(a.d) || b.i - a.i);
+  latest = latest.concat(archive.slice(0, LATEST_COUNT - latest.length));
+}
+
 // Preview deployments only: top up with clearly labeled sample posts.
 // Never on production (VERCEL_ENV === 'production').
 const env = process.env.VERCEL_ENV || 'development';
