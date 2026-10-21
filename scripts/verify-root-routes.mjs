@@ -33,7 +33,7 @@ async function check(name, url, expect) {
 
 await check('home', `${BASE}/`, { titleIncludes: 'Trond', hasRoot: true });
 await check('arkiv', `${BASE}/arkiv`, { titleIncludes: 'Arkiv' });
-await check('boker', `${BASE}/boker`, { titleIncludes: 'Bøker' });
+await check('boker', `${BASE}/boker`, { titleIncludes: 'Bibliotek' });
 await check('om', `${BASE}/om`, { titleIncludes: 'Om', noHeading: true });
 await check('post', `${BASE}/?m=2026-09&i=0`, { titleIncludes: 'Trond' });
 
