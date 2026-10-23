@@ -59,38 +59,17 @@ allPosts.sort((a, b) => a.d.localeCompare(b.d));
 console.log(`\nTotal posts: ${allPosts.length}`);
 console.log(`Date range: ${allPosts[0].d} to ${allPosts[allPosts.length - 1].d}`);
 
-// data/arkiv/YYYY.json: every written post of a year for the /arkiv index,
-// with a short first-line excerpt so near-identical titles can be told apart
+// data/arkiv/YYYY.json + years.json: every written post per year for /arkiv,
+// including email posts from 2026 on (see lib/arkiv.js)
 {
-  const { sanitizeSubject, sanitizeEmailContent } = require('./lib/sanitize');
+  const { buildArkiv } = require('./lib/arkiv');
   const outDir = path.join(dataDir, 'arkiv');
+  fs.rmSync(outDir, { recursive: true, force: true });
   fs.mkdirSync(outDir, { recursive: true });
-  const flat = (s) => String(s || '').replace(/\s+/g, ' ').trim();
-  const norm = (s) => s.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '');
-  const excerpt = (t, x) => {
-    let f = flat(x);
-    // the body often opens by repeating the title; skip that so the excerpt adds something
-    const nt = norm(t);
-    if (nt.length > 8) {
-      for (let k = Math.min(f.length, t.length + 40); k > 0; k--) {
-        if (norm(f.slice(0, k)) === nt) { f = f.slice(k).replace(/^[\s.,:;–—-]+/, ''); break; }
-      }
-    }
-    if (f.length <= 170) return f;
-    return f.slice(0, f.lastIndexOf(' ', 170)) + ' …';
-  };
-  const years = {};
-  for (const p of allPosts) {
-    const t = sanitizeSubject(p.t) || 'Uten tittel';
-    (years[p.d.slice(0, 4)] ||= []).push([p.i, p.d, t, p._m, excerpt(t, sanitizeEmailContent(p.x || ''))]);
-  }
-  const ys = Object.keys(years).filter((y) => y < '2026').sort();
-  for (const y of ys) {
-    years[y].sort((a, b) => b[1].localeCompare(a[1]) || b[0] - a[0]);
-    fs.writeFileSync(path.join(outDir, `${y}.json`), JSON.stringify(years[y]));
-  }
-  fs.writeFileSync(path.join(outDir, 'years.json'), JSON.stringify(ys.map((y) => [y, years[y].length])));
-  console.log(`✓ Wrote data/arkiv/ for ${ys.length} years`);
+  const { years, byYear } = buildArkiv(allPosts);
+  for (const [y] of years) fs.writeFileSync(path.join(outDir, `${y}.json`), JSON.stringify(byYear[y]));
+  fs.writeFileSync(path.join(outDir, 'years.json'), JSON.stringify(years));
+  console.log(`✓ Wrote data/arkiv/ for ${years.length} years (${years.map(([y, n]) => `${y}: ${n}`).join(', ')})`);
 }
 allPosts.forEach((p) => delete p._m);
 // Write index.json
