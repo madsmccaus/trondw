@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Trond Worren archive with email-to-blog functionality",
   "scripts": {
-    "build": "node build-index.js",
+    "build": "node scripts/build-dist.js",
     "prune-archive": "node scripts/prune-archive-junk.js && node build-index.js",
     "dev": "npx serve .",
     "deploy": "vercel",
