@@ -130,3 +130,49 @@ test('helpers', () => {
   assert.strictEqual(mod.extractAddress('A B <X@Y.no>'), 'x@y.no');
   assert.deepStrictEqual(mod.parseAllowedSenders(' A@b.no ,, c@d.no'), ['a@b.no', 'c@d.no']);
 });
+
+test('storePost commits only the monthly data file (no Trigger rebuild)', async () => {
+  const updates = [];
+  const octokit = {
+    repos: {
+      getContent: async ({ path }) => {
+        if (path === 'data/2026-10.json') {
+          return { data: { content: Buffer.from('[]').toString('base64'), sha: 'month-sha' } };
+        }
+        const err = new Error('not found');
+        err.status = 404;
+        throw err;
+      },
+      createOrUpdateFileContents: async (opts) => {
+        updates.push(opts);
+        return { data: {} };
+      }
+    }
+  };
+  const env = { GITHUB_OWNER: 'o', GITHUB_REPO: 'r', GITHUB_BRANCH: 'main' };
+  const orig = { ...process.env };
+  Object.assign(process.env, env);
+
+  try {
+    const result = await mod.storePost({
+      d: '2026-10-12',
+      t: 'Hei',
+      s: 'hei',
+      c: 'dagbok',
+      x: 'innhold',
+      u: '',
+      img: [],
+      dr: [],
+      src: 'email'
+    }, octokit);
+    assert.strictEqual(result.success, true);
+    assert.strictEqual(updates.length, 1);
+    assert.strictEqual(updates[0].path, 'data/2026-10.json');
+    assert.match(updates[0].message, /Add email post/);
+    assert.ok(!updates.some((u) => u.message === 'Trigger rebuild'));
+    assert.ok(!updates.some((u) => u.path === 'data/.last-update'));
+  } finally {
+    for (const key of Object.keys(env)) delete process.env[key];
+    Object.assign(process.env, orig);
+  }
+});

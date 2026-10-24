@@ -1,6 +1,6 @@
 {
-  "buildCommand": "node build-index.js",
-  "outputDirectory": ".",
+  "buildCommand": "node scripts/build-dist.js",
+  "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
   "headers": [
