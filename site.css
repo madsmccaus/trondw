@@ -50,6 +50,10 @@ body>.page{border-top:1px solid transparent}
 .theme:focus-visible{outline:none}.theme:focus-visible .track{outline:2px solid var(--ink);outline-offset:2px}
 footer.site{display:flex;flex-direction:column;align-items:center;gap:1.1rem;padding:5rem 0 3rem;font-family:var(--sans);font-size:.85rem;color:var(--mute)}
 footer.site p{margin:0}
+footer.site .quiet{display:flex;flex-wrap:wrap;justify-content:center;gap:.35rem 1.15rem;margin:0}
+footer.site .quiet a{color:var(--mute);padding:.35rem 0}
+footer.site .quiet a[hidden]{display:none}
+@media (hover:hover) and (pointer:fine){footer.site .quiet a:hover{color:var(--ink)}}
 /* Cross-fade content only; site header stays fixed (MPA + SPA) */
 @keyframes vt-out{to{opacity:0}}
 @keyframes vt-in{from{opacity:0}}
@@ -60,3 +64,40 @@ footer.site p{margin:0}
   ::view-transition-new(page-content){animation:vt-in .16s ease-out .12s both}
 }
 @media(max-width:760px){.site-head{padding:2rem 1.15rem 0}.site-nav{gap:1.1rem}}
+/* Kontakt, Støtt siden, Besøk: the same quiet page, a little narrower than the header */
+.page.narrow{max-width:42rem;margin:0 auto;padding:0 1.5rem}
+.page.narrow>main.page-content{padding-top:2.5rem}
+@media(max-width:600px){.page.narrow{padding:0 1.15rem}}
+.prose h1{font-size:clamp(2rem,5vw,2.6rem);font-weight:500;line-height:1.15;letter-spacing:-0.01em;margin:0 0 1rem;text-wrap:balance}
+.prose h2{font-size:1.35rem;font-weight:500;line-height:1.2;margin:2.2rem 0 .7rem}
+.prose .lede,.prose p{font-size:1.2rem;line-height:1.65;margin:0 0 1.1rem}
+.prose a.u{border-bottom:1px solid currentColor}
+@media (hover:hover) and (pointer:fine){.prose a.u:hover{color:var(--accent)}}
+.prose .fine{font-family:var(--sans);font-size:.9rem;color:var(--mute)}
+@media(max-width:600px){.prose .lede,.prose p{font-size:1.125rem}}
+.quiet-form label{display:block;font-family:var(--sans);font-size:.85rem;font-weight:500;color:var(--mute);margin:0 0 1.15rem}
+.quiet-form .opt{font-weight:400}
+.quiet-form input,.quiet-form textarea{display:block;width:100%;margin:.4rem 0 0;font:inherit;font-family:var(--serif);font-size:1.15rem;line-height:1.45;color:var(--ink);background:transparent;border:0;border-bottom:1px solid var(--rule);border-radius:0;padding:.5rem 0}
+.quiet-form textarea{min-height:8.5rem;resize:vertical;border:1px solid var(--rule);border-radius:6px;padding:.75rem .85rem}
+.quiet-form input:focus-visible,.quiet-form textarea:focus-visible{outline:none;border-color:var(--ink)}
+.quiet-form button{font-family:var(--sans);font-size:.95rem;font-weight:500;color:var(--paper);background:var(--ink);border:0;border-radius:6px;padding:.75rem 1.25rem;cursor:pointer;margin-top:.3rem}
+.quiet-form button:active{transform:scale(.97)}
+.quiet-form button:disabled{opacity:.55;cursor:default;transform:none}
+@media (prefers-reduced-motion:reduce){.quiet-form button:active{transform:none}}
+.status{font-family:var(--sans);font-size:.95rem;min-height:1.3em;margin:0 0 1rem}
+.status.ok{font-family:var(--serif);font-size:1.2rem;color:var(--ink)}
+.status.bad{color:var(--accent)}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.vipps-label{font-family:var(--sans);font-size:.85rem;color:var(--mute);margin:1.4rem 0 .2rem}
+.vipps-number{font-size:2rem;letter-spacing:.04em;font-variant-numeric:tabular-nums;margin:0 0 1.2rem}
+.qr-pad{display:inline-block;background:#fffdf8;padding:.75rem;line-height:0;margin:.4rem 0 1rem}
+.qr-pad svg{display:block;width:min(12.5rem,70vw);height:auto}
+.figures{display:flex;gap:2.5rem;margin:1.5rem 0 1.8rem}
+.figures p{margin:0}
+.figures span{display:block;font-family:var(--sans);font-size:.8rem;color:var(--mute);margin:0 0 .15rem}
+.figures strong{font-size:2.1rem;font-weight:500;font-variant-numeric:tabular-nums}
+.stats-list{list-style:none;margin:0;padding:0;font-family:var(--sans);font-size:.95rem}
+.stats-list li{display:flex;justify-content:space-between;gap:1rem;padding:.45rem 0;border-bottom:1px solid var(--rule)}
+.stats-list .n{color:var(--mute);font-variant-numeric:tabular-nums}
+button.linkish{font-family:var(--sans);font-size:.85rem;color:var(--mute);background:none;border:0;padding:.4rem 0;margin-top:2rem;cursor:pointer}
+@media (hover:hover) and (pointer:fine){button.linkish:hover{color:var(--ink)}}

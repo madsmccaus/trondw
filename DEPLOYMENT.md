@@ -110,3 +110,59 @@ to the same branch as `GITHUB_BRANCH`, then redeploy so the env vars take effect
 - **200 "Sender not allowed"**: add the address to `ALLOWED_SENDERS` and redeploy.
 - **Mail never reaches Resend**: check `dig MX post.trondworren.net` and the domain status in Resend.
 - **Post committed but not on the site**: the Vercel Git integration or production branch is wrong.
+
+### Contact form, visitor counts and Vipps
+
+These three additions use server-side environment variables. None of the
+addresses, the password, the salt or the Vipps number belong in the repository
+or in the HTML.
+
+**Contact form** (`/kontakt`):
+
+| Variable | Purpose |
+| --- | --- |
+| `CONTACT_TO_EMAIL` | Inbox that receives the message. Set this in Vercel only. |
+| `CONTACT_FROM_EMAIL` | Address Resend is allowed to send from. A bare address is sent as `Trond Worren-arkivet <address>`. |
+| `RESEND_API_KEY` | Already used to read inbound mail. The form reuses it. No second key. |
+
+Receiving on `post.trondworren.net` was set up with sending turned off. Resend
+will refuse the contact mail until `CONTACT_FROM_EMAIL` is on a domain Resend
+may send from. Either turn sending on for that domain, or use another verified
+domain. The form fails closed with a short Norwegian message if any of the three
+values is missing.
+
+The form has a hidden honeypot field, length limits, and a per-address rate
+limit (five messages an hour on each server instance).
+
+**Visitor page** (`/admin`, not linked, `noindex`):
+
+Vercel Web Analytics is not enabled on this project, and the visits API cannot
+be read until it is. The page therefore counts readers itself: no cookies, no
+stored addresses, known bots skipped, one count per person per day (a salted
+hash). The log needs a store. The project has none. GitHub is the wrong place,
+because each write would publish a new copy of the site.
+
+The cheapest fit is a **private Vercel Blob** store. On the Hobby plan the
+included allowance is 1 GB, 10,000 simple operations and 2,000 advanced
+operations a month, shared with the project's other Vercel usage. A quiet
+archive fits. If the free allowance runs out, Blob pauses until the next
+period; it does not add a charge on Hobby. Do not create the store from CI.
+
+| Variable | Purpose |
+| --- | --- |
+| `BLOB_READ_WRITE_TOKEN` | Created when a private Blob store is connected to the project. |
+| `VISIT_SALT` | Long random string mixed into the daily visitor hash. |
+| `ADMIN_PASSWORD` | Password for `/admin`. A signed httpOnly cookie lasts a week. |
+
+Until the Blob token and the salt are both set, `/admin` says plainly that the
+numbers are not real yet. It does not invent counts.
+
+**Vipps** (`/stott`, footer link "Støtt siden"):
+
+| Variable | Purpose |
+| --- | --- |
+| `VIPPS_NUMBER` | Number readers should send a gift to. |
+| `VIPPS_LINK` | Optional `http(s)` link. A link that is not http(s) is ignored. |
+
+If neither is set, the footer link stays hidden and `/stott` returns 404.
+Nothing is charged on the site. There is no card form.
