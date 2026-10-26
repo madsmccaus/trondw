@@ -38,7 +38,7 @@ function monthBodyHTML(y,groups){
     g.rows.map(r=>`<li class="row"><p class="date">${TW.date(r[1])}</p><h3><a href="${postHref(r[3],r[0])}">${TW.esc(r[2])}</a></h3>${r[4]?`<p class="x">${TW.esc(r[4])}</p>`:''}</li>`).join('')}</ol></section>`).join('');}
 function archiveIndexBody(){
   return `<div class="ark-intro"><p class="ark-lead">Velg et år for å bla i innlegg.</p>
-    <ul class="ark-year-list">${YEARS.map(([yy,n])=>`<li><a href="/arkiv?y=${yy}">${yy}</a><span class="n">${fmt(n)} innlegg</span></li>`).join('')}</ul></div>`;}
+    <ul class="ark-year-list">${YEARS.map(([yy,n])=>`<li><a href="/arkiv?y=${yy}">${yy}<span class="sr">, </span><span class="n">${fmt(n)} innlegg</span></a></li>`).join('')}</ul></div>`;}
 function archiveHTML(y,rows,hashMo){
   const groups=y?archiveMonths(rows):Array.from({length:12},(_,i)=>({mo:String(i+1).padStart(2,'0'),rows:[]}));
   const body=y?monthBodyHTML(y,groups):archiveIndexBody();
