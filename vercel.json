@@ -12,6 +12,13 @@
           "value": "public, max-age=3600, s-maxage=86400"
         }
       ]
+    },
+    {
+      "source": "/admin",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
+        { "key": "Cache-Control", "value": "private, no-store" }
+      ]
     }
   ],
   "redirects": [
@@ -115,5 +122,10 @@
       "destination": "/",
       "permanent": false
     }
+  ],
+  "rewrites": [
+    { "source": "/kontakt", "destination": "/api/contact" },
+    { "source": "/stott", "destination": "/api/stott" },
+    { "source": "/admin", "destination": "/api/admin" }
   ]
 }

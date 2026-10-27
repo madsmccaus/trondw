@@ -56,6 +56,14 @@ gets an MX record.
 
 **Full setup steps and checklist: see [DEPLOYMENT.md](DEPLOYMENT.md).**
 
+## Kontakt, besøk og Vipps
+
+- `/kontakt` is a short form. It sends the message with Resend.
+- `/admin` is a private page with visitor counts. It is not linked from the site.
+- `/stott` explains how to send Trond a gift with Vipps. The footer link and the page stay hidden until a Vipps number or link is configured.
+
+The environment variables for these are listed in [DEPLOYMENT.md](DEPLOYMENT.md).
+
 Run the tests with `npm test`.
 
 ## 🔒 Security & Privacy
