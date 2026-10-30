@@ -51,9 +51,9 @@ function detectCategory(title, content) {
   return 'dagbok';
 }
 
-// Store post in GitHub via API
-async function storePost(post) {
-  const octokit = new Octokit({
+// Store post in GitHub via API (octokit optional for tests)
+async function storePost(post, octokitInstance) {
+  const octokit = octokitInstance || new Octokit({
     auth: process.env.GITHUB_TOKEN
   });
   
@@ -100,6 +100,8 @@ async function storePost(post) {
     currentPosts.sort((a, b) => a.d.localeCompare(b.d));
     
     // Update file
+    // One commit per post: Vercel rebuilds on push; build-index.js regenerates
+    // index.json, data/arkiv/, and data/latest.json during the deploy build.
     await octokit.repos.createOrUpdateFileContents({
       owner,
       repo,
@@ -109,33 +111,7 @@ async function storePost(post) {
       branch,
       sha
     });
-    
-    // Trigger index rebuild by updating a timestamp file
-    const buildTriggerPath = 'data/.last-update';
-    let buildSha = null;
-    
-    try {
-      const { data: buildData } = await octokit.repos.getContent({
-        owner,
-        repo,
-        path: buildTriggerPath,
-        ref: branch
-      });
-      buildSha = buildData.sha;
-    } catch (err) {
-      // File doesn't exist
-    }
-    
-    await octokit.repos.createOrUpdateFileContents({
-      owner,
-      repo,
-      path: buildTriggerPath,
-      message: 'Trigger rebuild',
-      content: Buffer.from(new Date().toISOString()).toString('base64'),
-      branch,
-      sha: buildSha
-    });
-    
+
     return { success: true, postId: post.i, file: filePath };
   } catch (error) {
     console.error('Error storing post:', error);
@@ -309,6 +285,7 @@ module.exports = createHandler();
 // Vercel: keep the raw body so the signature can be verified
 module.exports.config = { api: { bodyParser: false } };
 module.exports.createHandler = createHandler;
+module.exports.storePost = storePost;
 module.exports.verifyWebhookSignature = verifyWebhookSignature;
 module.exports.sanitizeEmailContent = sanitizeEmailContent;
 module.exports.sanitizeSubject = sanitizeSubject;
