@@ -52,7 +52,7 @@ Updated Archive Site
 ### Key Files Created
 - `api/inbound-email.js` - Email webhook handler (275 lines)
 - `api/test-email.js` - Test simulation endpoint
-- `build-index.js` - Index generator
+- `scripts/build.js` - builds public/ (see DEPLOYMENT.md)
 - `package.json` - Dependencies (@octokit/rest)
 - `vercel.json` - Deployment config
 - `README.md` - Complete setup guide

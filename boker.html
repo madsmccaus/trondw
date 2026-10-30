@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bibliotek · Trond Worren</title>
 <script src="/theme.js"></script>
+<link rel="preconnect" href="https://trondw-assets.vercel.app">
 <link rel="preload" href="/fonts/EBGaramond-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/EBGaramond-Italic-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/site.css">
@@ -154,7 +155,8 @@ const MNF=['januar','februar','mars','april','mai','juni','juli','august','septe
 const fDate=d=>{const t=new Date(d+'T12:00:00');return `${t.getDate()}. ${MNF[t.getMonth()]} ${t.getFullYear()}`;};
 const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const title=t=>TWSanitize.sanitizeSubject(t)||'Uten tittel';
-const src=(d,w)=>`/covers/${d.id}-${w}.webp`;
+const ASSETS="https://trondw-assets.vercel.app";
+const src=(d,w)=>`${ASSETS}/covers/${d.id}-${w}.webp`;
 const BATCH=48;
 let DOCS=[],view=[],shown=0,year=null,cur=-1,list=[];
 
@@ -320,7 +322,7 @@ async function openReader(d,el){
   if(phase==='closing')finishNow();
   if(phase!=='closed')return;phase='opening';pendingTurns=0;doc=d;srcEl=el;lastFocus=document.activeElement;
   const m=FLIP[d.id];N=m?m.n:1;ar=m?m.w/m.h:d.w/d.h;
-  pages=m?Array.from({length:N},(_,i)=>m.base?`${m.base}/${i+1}.webp`:`/flip/${d.id}/${i+1}.webp`):[];
+  pages=m?Array.from({length:N},(_,i)=>m.base?`${m.base}/${i+1}.webp`:`${ASSETS}/flip/${d.id}/${i+1}.webp`):[];
   pages[0]=el.currentSrc||src(d,720);
   mode=N>=3?'book':'sheet';pos=1;sheetA=0;T=null;S=null;
   meta.innerHTML=`<p class="date">${fDate(d.d)}</p><h2 class="t" id="rdT">${esc(title(d.t))}</h2>${!m&&d.pdf?`<a href="https://drive.google.com/file/d/${encodeURIComponent(d.pdf)}/view" target="_blank" rel="noopener">Åpne i Google Drive</a>`:''}`;

@@ -6,3 +6,5 @@ node_modules/
 .DS_Store
 data/latest.json
 data/arkiv/
+public/
+assets-dist/

@@ -4,7 +4,9 @@
  * Resend receives mail for the receiving domain (post.trondworren.net), then
  * POSTs an `email.received` webhook here. The webhook only carries metadata,
  * so we fetch the body from the Receiving API, check the sender against an
- * allowlist, sanitize the content and commit the post to GitHub.
+ * allowlist, sanitize the content and commit the post to GitHub: one commit
+ * that adds it to data/YYYY-MM.json and appends it to the data/entries.json log.
+ * The site reads those files at request time (api/data.js), so no redeploy.
  *
  * Required environment variables:
  * - RESEND_WEBHOOK_SECRET: Signing secret of the Resend webhook (whsec_...)
@@ -13,13 +15,13 @@
  * - GITHUB_TOKEN: Fine-grained token with Contents read/write on the repo
  * - GITHUB_OWNER: Repository owner (e.g. 'madsmccaus')
  * - GITHUB_REPO: Repository name (e.g. 'trondw')
- * - GITHUB_BRANCH: Branch to commit to (the Vercel production branch)
+ * - GITHUB_BRANCH: Branch to commit to (default 'main')
  * Optional:
  * - POST_TIMEZONE: Timezone used for the post date (default Europe/Oslo)
  */
 
 const crypto = require('crypto');
-const { Octokit } = require('@octokit/rest');
+const { storePost } = require('../lib/post-store');
 
 const { sanitizeEmailContent, sanitizeSubject, htmlToText } = require('../lib/sanitize');
 
@@ -50,99 +52,6 @@ function detectCategory(title, content) {
   // Default to 'dagbok' (diary)
   return 'dagbok';
 }
-
-// Store post in GitHub via API
-async function storePost(post) {
-  const octokit = new Octokit({
-    auth: process.env.GITHUB_TOKEN
-  });
-  
-  const owner = process.env.GITHUB_OWNER;
-  const repo = process.env.GITHUB_REPO;
-  const branch = process.env.GITHUB_BRANCH || 'feat/vercel-archive-demo';
-  
-  // Determine which monthly file to update
-  const yearMonth = post.d.slice(0, 7); // e.g., "2024-09"
-  const filePath = `data/${yearMonth}.json`;
-  
-  try {
-    // Get current file content
-    let currentPosts = [];
-    let sha = null;
-    
-    try {
-      const { data: fileData } = await octokit.repos.getContent({
-        owner,
-        repo,
-        path: filePath,
-        ref: branch
-      });
-      
-      const content = Buffer.from(fileData.content, 'base64').toString('utf-8');
-      currentPosts = JSON.parse(content);
-      sha = fileData.sha;
-    } catch (err) {
-      // File doesn't exist yet, will create new
-      if (err.status !== 404) throw err;
-    }
-    
-    // Find the highest 'i' (post id) in current month
-    const maxId = currentPosts.length > 0 
-      ? Math.max(...currentPosts.map(p => p.i))
-      : -1;
-    
-    post.i = maxId + 1;
-    
-    // Add post to array
-    currentPosts.push(post);
-    
-    // Sort by date
-    currentPosts.sort((a, b) => a.d.localeCompare(b.d));
-    
-    // Update file
-    await octokit.repos.createOrUpdateFileContents({
-      owner,
-      repo,
-      path: filePath,
-      message: `Add email post: ${post.t}`,
-      content: Buffer.from(JSON.stringify(currentPosts, null, 2)).toString('base64'),
-      branch,
-      sha
-    });
-    
-    // Trigger index rebuild by updating a timestamp file
-    const buildTriggerPath = 'data/.last-update';
-    let buildSha = null;
-    
-    try {
-      const { data: buildData } = await octokit.repos.getContent({
-        owner,
-        repo,
-        path: buildTriggerPath,
-        ref: branch
-      });
-      buildSha = buildData.sha;
-    } catch (err) {
-      // File doesn't exist
-    }
-    
-    await octokit.repos.createOrUpdateFileContents({
-      owner,
-      repo,
-      path: buildTriggerPath,
-      message: 'Trigger rebuild',
-      content: Buffer.from(new Date().toISOString()).toString('base64'),
-      branch,
-      sha: buildSha
-    });
-    
-    return { success: true, postId: post.i, file: filePath };
-  } catch (error) {
-    console.error('Error storing post:', error);
-    throw error;
-  }
-}
-
 
 // Verify a Resend (Svix-format) webhook signature over the raw body.
 // Signed content is `${svix-id}.${svix-timestamp}.${rawBody}`; the key is the
@@ -292,7 +201,20 @@ function createHandler(deps = {}) {
         src: 'email'
       };
 
-      const result = await store(post);
+      const images = (email.attachments || meta.attachments || []).map((a) => ({
+        id: a.id || null,
+        filename: a.filename || null,
+        content_type: a.content_type || null,
+        size: a.size == null ? null : a.size
+      }));
+      const result = await store(post, {
+        emailId: meta.email_id,
+        receivedAt: email.created_at || meta.created_at || event.created_at || null,
+        images
+      });
+      if (result.duplicate) {
+        return res.status(200).json({ message: 'Already published', post: { id: result.postId, file: result.file } });
+      }
 
       return res.status(200).json({
         message: 'Email processed successfully',

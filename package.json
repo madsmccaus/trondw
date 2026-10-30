@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "Trond Worren archive with email-to-blog functionality",
   "scripts": {
-    "build": "node build-index.js",
-    "prune-archive": "node scripts/prune-archive-junk.js && node build-index.js",
-    "dev": "npx serve .",
-    "deploy": "vercel",
+    "build": "node scripts/build.js",
+    "build:assets": "node scripts/build-assets.js assets-dist",
+    "prune-archive": "node scripts/prune-archive-junk.js && node scripts/build.js",
+    "dev": "npx serve public",
     "test": "node --test test/*.test.js"
   },
   "keywords": [
@@ -17,7 +17,6 @@
   "author": "Mads",
   "license": "MIT",
   "dependencies": {
-    "@octokit/rest": "^20.0.2",
     "@vercel/blob": "^2.8.2",
     "qrcode": "^1.5.4"
   }

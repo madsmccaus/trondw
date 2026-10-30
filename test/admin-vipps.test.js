@@ -196,5 +196,6 @@ test('the inbox address is not written into the repo, and the footer link is qui
     assert.match(html, /id="vipps-link" hidden>Støtt siden/);
   }
   const vercel = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'vercel.json'), 'utf8'));
-  assert.deepEqual(vercel.rewrites.map((r) => r.source), ['/kontakt', '/stott', '/admin']);
+  const pages = vercel.rewrites.filter((r) => !r.source.startsWith('/data/'));
+  assert.deepEqual(pages.map((r) => r.source), ['/kontakt', '/stott', '/admin']);
 });

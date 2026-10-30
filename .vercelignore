@@ -1,0 +1,16 @@
+# Only what the build (scripts/build.js) and the API functions need is uploaded.
+# Scans, covers and frozen archive months are served by trondw-assets.
+flip/*
+!flip/manifest.json
+covers/
+test/
+docs/
+*.md
+.DS_Store
+.env*
+node_modules/
+public/
+assets-dist/
+scripts/*
+!scripts/build.js
+!scripts/ignore-build.sh

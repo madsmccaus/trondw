@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Remove junk posts from data/YYYY-MM.json (WordPress 404 pages, empty stubs, etc.).
- * Re-run after bulk imports; build-index.js applies the same rules when indexing.
+ * Re-run after bulk imports; scripts/build.js and api/data.js apply the same rules.
  */
 
 const fs = require('fs');

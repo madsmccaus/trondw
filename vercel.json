@@ -1,11 +1,11 @@
 {
-  "buildCommand": "node build-index.js",
-  "outputDirectory": ".",
+  "buildCommand": "node scripts/build.js",
+  "outputDirectory": "public",
   "cleanUrls": true,
   "trailingSlash": false,
   "headers": [
     {
-      "source": "/data/(.*)",
+      "source": "/data/documents.json",
       "headers": [
         {
           "key": "Cache-Control",
@@ -16,8 +16,14 @@
     {
       "source": "/admin",
       "headers": [
-        { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
-        { "key": "Cache-Control", "value": "private, no-store" }
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
       ]
     }
   ],
@@ -124,8 +130,46 @@
     }
   ],
   "rewrites": [
-    { "source": "/kontakt", "destination": "/api/contact" },
-    { "source": "/stott", "destination": "/api/stott" },
-    { "source": "/admin", "destination": "/api/admin" }
-  ]
+    {
+      "source": "/data/:m(20[01]\\d-\\d{2}|202[0-5]-\\d{2}).json",
+      "destination": "https://trondw-assets.vercel.app/data/:m.json"
+    },
+    {
+      "source": "/data/arkiv/:y(20[01]\\d|202[0-5]).json",
+      "destination": "https://trondw-assets.vercel.app/data/arkiv/:y.json"
+    },
+    {
+      "source": "/data/latest.json",
+      "destination": "/api/data?f=latest"
+    },
+    {
+      "source": "/data/meta.json",
+      "destination": "/api/data?f=meta"
+    },
+    {
+      "source": "/data/arkiv/years.json",
+      "destination": "/api/data?f=years"
+    },
+    {
+      "source": "/data/arkiv/:y(\\d{4}).json",
+      "destination": "/api/data?f=arkiv&y=:y"
+    },
+    {
+      "source": "/data/:m(\\d{4}-\\d{2}).json",
+      "destination": "/api/data?f=month&m=:m"
+    },
+    {
+      "source": "/kontakt",
+      "destination": "/api/contact"
+    },
+    {
+      "source": "/stott",
+      "destination": "/api/stott"
+    },
+    {
+      "source": "/admin",
+      "destination": "/api/admin"
+    }
+  ],
+  "ignoreCommand": "sh scripts/ignore-build.sh"
 }
