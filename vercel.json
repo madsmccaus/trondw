@@ -29,6 +29,16 @@
   ],
   "redirects": [
     {
+      "source": "/covers/:path*",
+      "destination": "https://trondw-assets.vercel.app/covers/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/flip/:id/:page(\\d+\\.webp)",
+      "destination": "https://trondw-assets.vercel.app/flip/:id/:page",
+      "permanent": true
+    },
+    {
       "source": "/v4/dokumenter",
       "destination": "/boker",
       "permanent": true

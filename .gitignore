@@ -8,3 +8,5 @@ data/latest.json
 data/arkiv/
 public/
 assets-dist/
+.vercel
+.env*
