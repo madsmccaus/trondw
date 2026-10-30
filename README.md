@@ -30,14 +30,12 @@ The archive includes:
 # Install dependencies
 npm install
 
-# Generate index from monthly data files
+# Build public/ (pages + client code)
 npm run build
 
-# Start local server
-npm run dev
+# Full local site incl. /api/data (live data) and rewrites
+vercel dev
 ```
-
-Open `http://localhost:3000` to view the archive.
 
 ## 📧 Email-to-Blog
 
@@ -49,7 +47,8 @@ handler then:
 2. checks that the sender is on the `ALLOWED_SENDERS` allowlist;
 3. fetches the body from Resend's Receiving API (`RESEND_API_KEY`);
 4. strips headers, addresses and recipient lists, then dates the post in Europe/Oslo time;
-5. commits it to `data/YYYY-MM.json` on `GITHUB_BRANCH`, which triggers a Vercel redeploy.
+5. commits it, in one commit, to `data/YYYY-MM.json` and the `data/entries.json` log on `main`.
+   No redeploy: `/api/data` serves email-era data live (see DEPLOYMENT.md).
 
 The root `trondworren.net` mail and website are untouched. Only the `post` subdomain
 gets an MX record.
@@ -104,7 +103,7 @@ Categories: `dagbok`, `dikt`, `forkynnelse`, `plakat`, `annet`, `mirakel`, `bok`
 - **Backend:** Vercel Serverless Functions (Node.js)
 - **Storage:** GitHub as database (commits to JSON files)
 - **Email:** Resend Inbound Email API
-- **Deployment:** Vercel
+- **Deployment:** Vercel (`trondw` for the site, `trondw-assets` for scans, covers and the frozen archive)
 
 ## 📝 Manual Tasks After Deployment
 

@@ -2,14 +2,36 @@
 
 The archive is a static site on Vercel (project `trondw`). Trond publishes by
 emailing an address at **`post.trondworren.net`**. Resend receives the mail
-and calls `/api/inbound-email`, which commits the post to GitHub. The
-commit then triggers a Vercel redeploy.
+and calls `/api/inbound-email`, which commits the post to GitHub. **No redeploy
+happens**: the site reads email-era posts from GitHub at request time.
 
 ```
 Trond's mail ─▶ MX post.trondworren.net (Resend) ─▶ webhook email.received
   ─▶ /api/inbound-email (verify signature, allowlist, fetch body, sanitize)
-  ─▶ commit data/YYYY-MM.json on GITHUB_BRANCH ─▶ Vercel redeploy
+  ─▶ ONE commit on GITHUB_BRANCH (main): data/YYYY-MM.json + data/entries.json
+  ─▶ /api/data reads it (CDN cache 60 s) ─▶ post visible in about a minute
 ```
+
+### Lean hosting layout (Oct 2026)
+
+| What | Where | Deployed when |
+|---|---|---|
+| Pages, CSS/JS, fonts, flip manifest (~0.4 MB) | project `trondw`, `public/` built by `scripts/build.js` | code changes only |
+| Email-era data: `/data/latest.json`, `meta.json`, `arkiv/years.json`, `arkiv/2026+.json`, `2026+-MM.json` | `api/data.js` reads `data/` on GitHub `main` | never (live) |
+| Frozen archive months (before 2026) + their year files | project `trondw-assets`, reached via rewrites in `vercel.json` | rarely, by hand |
+| Book scans `flip/` and covers `covers/` (~240 MB) | project `trondw-assets` (https://trondw-assets.vercel.app) | rarely, by hand |
+
+- `data/entries.json` is the append-only log of every email entry (date, title,
+  body, category, Resend `email_id`, received time, attachment metadata, and the
+  post it became). One JSON object per line. Webhook retries are deduped on `email_id`.
+- `scripts/ignore-build.sh` (Vercel ignored build step) skips a deploy when only
+  live data changed since the last deploy of the branch.
+- `scripts/backfill-entries.js` re-syncs `entries.json` with the month files
+  (and fills `email_id` from Resend when `RESEND_API_KEY` is set).
+- To change scans, covers or pre-2026 months:
+  `node scripts/build-assets.js <dir> && cd <dir> && vercel deploy --prod`
+  (the dir must be linked to `trondw-assets`). Then delete the old assets deployment.
+- Retention on `trondw`: old deployments expire after 7 days; a few are kept.
 
 ### Why a subdomain?
 
@@ -64,7 +86,7 @@ ALLOWED_SENDERS=trond@example.no,other@example.com   # comma-separated, case-ins
 GITHUB_TOKEN=github_pat_...
 GITHUB_OWNER=madsmccaus
 GITHUB_REPO=trondw
-GITHUB_BRANCH=<the Vercel production branch>
+GITHUB_BRANCH=main                                   # optional (default main)
 POST_TIMEZONE=Europe/Oslo                            # optional (default)
 ```
 
@@ -74,9 +96,9 @@ is acknowledged (200) but ignored.
 
 ### 5. Git integration
 
-New posts reach the site only if Vercel redeploys on push. In Vercel, go to
-**Project → Settings → Git** and connect `madsmccaus/trondw`. Set the production branch
-to the same branch as `GITHUB_BRANCH`, then redeploy so the env vars take effect.
+Vercel deploys code pushes to `main` (Project → Settings → Git). New posts do
+not need a deploy: `api/data.js` reads them from `GITHUB_BRANCH` with the same
+`GITHUB_TOKEN` (read access is enough for reading; the webhook needs write).
 
 ### 6. Test
 
@@ -84,8 +106,8 @@ to the same branch as `GITHUB_BRANCH`, then redeploy so the env vars take effect
 2. Send a mail from an allowlisted address to `blogg@post.trondworren.net`.
    Any local part works.
 3. Check that the email shows up in **Resend → Emails → Receiving**, that the webhook
-   delivery succeeded, that a new commit `Add email post: ...` exists, and that the
-   post appears on the site after the redeploy.
+   delivery succeeded, that a new commit `Add email post: ...` (month file +
+   `data/entries.json`) exists, and that the post appears within about a minute.
 
 ### Setup checklist
 
